@@ -5,6 +5,7 @@ import { ProveedorAviso } from './components/Aviso';
 import { ProveedorSesion } from './auth';
 import { iniciarBackend } from './lib/backend';
 import App from './App';
+import '@fontsource-variable/archivo/wdth.css';
 import './index.css';
 
 const qc = new QueryClient({

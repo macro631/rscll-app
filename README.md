@@ -42,7 +42,7 @@ npm install
 npm run dev          # http://localhost:5173, en modo demostración
 npm test             # 22 pruebas de reglas, permisos y RLS
 npm run build && npx vite preview --port 4173
-VITE_MODO=demo npm run build && npm run e2e   # recorrido en modo demostración
+VITE_MODO=demo npm run build && npx vite preview --port 4180   # y en otra terminal: npm run e2e
 node e2e/recorrido-supabase.mjs              # recorrido contra Supabase real (crea datos de prueba)
 ```
 

@@ -3,6 +3,8 @@ import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-quer
 import { useSesion } from '../../auth';
 import { useAviso } from '../../components/Aviso';
 import { api } from '../../lib/backend';
+import { Icono } from '../../components/Icono';
+import { PanelFiltros } from '../informes/Informes';
 import { useAccion, useCatalogo, useNombresUsuarios } from '../../lib/datos';
 import { descargar, fecha, nombreArchivo } from '../../lib/formato';
 import { ACCIONES, ESTADOS, ROLES, type EstadoRecinto, type Evento, type Pagina, type Perfil, type Rol } from '../../lib/tipos';
@@ -13,13 +15,20 @@ export default function Historial() {
   const [pestaña, setPestaña] = useState<'historial' | 'usuarios' | 'respaldo'>('historial');
   return (
     <div className="historial">
-      <h1>Historial y administración</h1>
-      <div className="pestañas" role="tablist">
-        {(['historial', 'usuarios', 'respaldo'] as const).map((p) => (
-          <button key={p} role="tab" aria-selected={pestaña === p} className={`pestaña${pestaña === p ? ' activa' : ''}`} onClick={() => setPestaña(p)}>
-            {p === 'historial' ? 'Historial' : p === 'usuarios' ? 'Usuarios' : 'Respaldo'}
-          </button>
-        ))}
+      <div className="pagina-cabeza">
+        <h1>Historial</h1>
+        <div className="segmentado" role="tablist" aria-label="Sección">
+          {([
+            ['historial', 'Movimientos', 'historial'],
+            ['usuarios', 'Usuarios', 'usuarios'],
+            ['respaldo', 'Respaldo', 'respaldo'],
+          ] as const).map(([p, texto, icono]) => (
+            <button key={p} role="tab" aria-selected={pestaña === p} onClick={() => setPestaña(p)}>
+              <Icono nombre={icono} tam={18} />
+              {texto}
+            </button>
+          ))}
+        </div>
       </div>
       {pestaña === 'historial' && <Movimientos />}
       {pestaña === 'usuarios' && <Usuarios />}
@@ -57,6 +66,7 @@ function Movimientos() {
 
   return (
     <>
+      <PanelFiltros resumen="">
       <div className="filtros">
         <label>
           Persona
@@ -88,7 +98,8 @@ function Movimientos() {
           <input type="date" value={f.hasta ?? ''} onChange={(e) => cambiar({ hasta: e.target.value || undefined })} />
         </label>
       </div>
-      <p className="suave">{total} movimiento(s)</p>
+      </PanelFiltros>
+      <p className="informe-total">{total} movimiento{total === 1 ? '' : 's'}</p>
       <div className="tabla-envoltura">
         <table className="tabla">
           <thead>
@@ -97,16 +108,16 @@ function Movimientos() {
           <tbody>
             {(datos.data?.filas ?? []).map((ev) => (
               <tr key={ev.id}>
-                <td className="pequeño">{fecha(ev.fecha)}</td>
+                <td className="celda-fecha">{fecha(ev.fecha)}</td>
                 <td>{ev.actor_nombre ?? '—'}</td>
                 <td>{ACCIONES[ev.accion] ?? ev.accion}</td>
-                <td>{ev.codigo ? <><strong>{ev.codigo}</strong> {ev.recinto_nombre}</> : '—'}</td>
-                <td className="pequeño">
+                <td>{ev.codigo ? <><span className="codigo">{ev.codigo}</span> {ev.recinto_nombre}</> : '—'}</td>
+                <td className="chico">
                   {estadoTexto(ev.antes)}
                   {estadoTexto(ev.antes) || estadoTexto(ev.despues) ? ' → ' : ''}
                   {estadoTexto(ev.despues)}
                 </td>
-                <td className="celda-texto pequeño">
+                <td className="celda-texto chico">
                   {ev.comentario ?? ''}
                   {typeof ev.despues?.descripcion === 'string' && <div>{String(ev.despues.especialidad ?? '')}: {ev.despues.descripcion}</div>}
                 </td>
@@ -116,9 +127,9 @@ function Movimientos() {
         </table>
       </div>
       <div className="paginacion">
-        <button className="boton" disabled={pagina === 0} onClick={() => setPagina((p) => p - 1)}>← Más recientes</button>
+        <button className="boton boton-sutil boton-chico" disabled={pagina === 0} onClick={() => setPagina((p) => p - 1)}>Más recientes</button>
         <span>Página {pagina + 1} de {paginas}</span>
-        <button className="boton" disabled={pagina + 1 >= paginas} onClick={() => setPagina((p) => p + 1)}>Más antiguos →</button>
+        <button className="boton boton-sutil boton-chico" disabled={pagina + 1 >= paginas} onClick={() => setPagina((p) => p + 1)}>Más antiguos</button>
       </div>
     </>
   );
@@ -196,7 +207,7 @@ function FilaUsuario({ u, esYo }: { u: Perfil; esYo: boolean }) {
       <td>
         <input value={nombre} onChange={(e) => setNombre(e.target.value)} onBlur={() => nombre.trim() && nombre !== u.nombre && guardar({ nombre })} aria-label="Nombre" />
       </td>
-      <td className="pequeño">{u.email}</td>
+      <td className="chico">{u.email}</td>
       <td>
         <select value={u.rol} disabled={esYo} onChange={(e) => guardar({ rol: e.target.value as Rol })} aria-label="Rol">
           {(Object.keys(ROLES) as Rol[]).map((r) => <option key={r} value={r}>{ROLES[r]}</option>)}

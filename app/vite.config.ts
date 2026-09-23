@@ -25,7 +25,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png}'],
+        globPatterns: ['**/*.{js,css,html,svg,png}', '**/archivo-latin-wdth-normal*.woff2'],
         // Lo pesado y opcional (modo demostración, PDF, Excel) no se precarga en la instalación:
         // se guarda en caché la primera vez que se usa, para no gastar datos móviles (§13).
         globIgnores: ['**/pglite*', '**/initdb*', '**/demo-*', '**/pdfmake-*', '**/vfs_fonts-*', '**/exceljs*'],

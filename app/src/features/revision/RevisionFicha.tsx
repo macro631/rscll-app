@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSesion } from '../../auth';
 import { useAviso } from '../../components/Aviso';
-import { EstadoBadge } from '../../components/Estado';
+import { Cajetin } from '../../components/Cajetin';
+import { Icono } from '../../components/Icono';
 import { ObservacionEnCola, ObservacionForm, ObservacionItem } from '../../components/Observacion';
 import { descartar, encolar, useCola } from '../../lib/cola';
 import { useAccion, useCatalogo, useFichaRevision } from '../../lib/datos';
@@ -17,15 +18,28 @@ export function RevisionFicha() {
   const ficha = useFichaRevision(id);
   const accion = useAccion();
   const cola = useCola().filter((i) => i.revisionId === id);
-  const [formulario, setFormulario] = useState(true);
+  const [formulario, setFormulario] = useState(false);
+  const editable = !!ficha.data && ficha.data.revision.autor_id === perfil?.id && ficha.data.revision.condicion === 'abierta';
+
+  // Abre el formulario la primera vez si la ficha propia está vacía: el siguiente paso es registrar.
+  useEffect(() => {
+    if (editable && ficha.data && ficha.data.observaciones.length === 0) setFormulario(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editable, ficha.data?.revision.id]);
+
+  // Los avisos se ubican sobre la barra de acciones.
+  useEffect(() => {
+    if (!editable) return;
+    document.body.classList.add('con-barra-acciones');
+    return () => document.body.classList.remove('con-barra-acciones');
+  }, [editable]);
 
   if (ficha.isLoading) return <p className="cargando">Cargando ficha…</p>;
-  if (ficha.error || !ficha.data) return <p className="error-texto">{ficha.error?.message ?? 'Ficha no encontrada'}</p>;
+  if (ficha.error || !ficha.data) return <p className="error-texto">{ficha.error?.message ?? 'No se encontró la ficha.'}</p>;
 
   const { revision, observaciones, estado } = ficha.data;
   const recinto = porId.get(revision.recinto_id);
-  const propia = revision.autor_id === perfil?.id;
-  const editable = propia && revision.condicion === 'abierta';
+  const total = observaciones.length + cola.length;
 
   function finalizar() {
     accion.mutate(
@@ -41,74 +55,79 @@ export function RevisionFicha() {
 
   return (
     <div className="ficha">
-      <header className="ficha-cabecera">
-        <Link to={recinto ? `/revision/recinto/${encodeURIComponent(recinto.codigo)}` : '/revision'} className="volver">
-          ← Ficha del recinto
-        </Link>
-        <h1>
-          <span className="ficha-codigo">{recinto?.codigo}</span> {recinto?.nombre}
-        </h1>
-        <p className="suave">
-          {revision.origen === 'inspeccion' ? 'Ficha de Inspección' : 'Ficha de revisión'} de {revision.autor} · inicio {fecha(revision.inicio)}
-          {revision.fin && <> · fin {fecha(revision.fin)}</>}
+      <Link to={recinto ? `/revision/recinto/${encodeURIComponent(recinto.codigo)}` : '/revision'} className="volver">
+        <Icono nombre="volver" tam={18} />
+        Ficha del recinto
+      </Link>
+      <Cajetin
+        codigo={recinto?.codigo ?? ''}
+        nombre={recinto?.nombre ?? ''}
+        estado={estado?.estado}
+        datos={[
+          { etiqueta: revision.origen === 'inspeccion' ? 'Ficha de Inspección' : 'Revisión de', valor: revision.autor },
+          { etiqueta: 'Inicio', valor: fecha(revision.inicio) },
+          ...(revision.fin ? [{ etiqueta: 'Fin', valor: fecha(revision.fin) }] : []),
+        ]}
+      >
+        <span className={`condicion condicion-${revision.condicion}`}>
+          {revision.condicion === 'abierta' ? 'Ficha abierta' : revision.condicion === 'finalizada' ? 'Ficha finalizada' : 'Ficha anulada'}
+        </span>
+      </Cajetin>
+      {revision.condicion === 'anulada' && <p className="nota nota-aviso">Anulada: {revision.motivo_anulacion}</p>}
+
+      <div className="seccion-titulo">
+        <h2>Observaciones de esta ficha</h2>
+        <span className="suave chico">{total}</span>
+      </div>
+      {total === 0 && (
+        <p className="vacio">
+          {editable
+            ? 'Aún no hay observaciones. Si el recinto no presenta defectos, puede finalizar la revisión.'
+            : 'Esta ficha no tiene observaciones.'}
         </p>
-        <div className="fila-badges">
-          <span className={`condicion condicion-${revision.condicion}`}>
-            {revision.condicion === 'abierta' ? 'Abierta' : revision.condicion === 'finalizada' ? 'Finalizada' : 'Anulada'}
-          </span>
-          <span className="suave">Recinto:</span>
-          <EstadoBadge estado={estado?.estado} />
-        </div>
-        {revision.condicion === 'anulada' && <p className="nota">Anulada: {revision.motivo_anulacion}</p>}
-      </header>
+      )}
+      <div className="lista-obs">
+        {cola.map((i) => (
+          <ObservacionEnCola key={i.id} item={i} alDescartar={() => descartar(i.id)} />
+        ))}
+        {[...observaciones].reverse().map((o) => (
+          <ObservacionItem key={o.id} obs={o} acciones={{ editar: editable, comprobar: true, devolver: true }} />
+        ))}
+      </div>
 
       {editable && (
-        <section className="tarjeta">
-          {formulario ? (
-            <ObservacionForm
-              clave={`revision:${revision.id}`}
-              alCancelar={() => setFormulario(false)}
-              alGuardar={async (d) => {
-                await encolar({
-                  tipo: 'observacion',
-                  recintoId: revision.recinto_id,
-                  revisionId: revision.id,
-                  especialidad: d.especialidad,
-                  descripcion: d.descripcion,
-                  fotos: d.fotos,
-                });
-                aviso(navigator.onLine ? 'Observación guardada' : 'Guardada en el teléfono; se enviará al tener conexión');
-              }}
-            />
-          ) : (
-            <button className="boton boton-primario boton-grande" onClick={() => setFormulario(true)}>
-              + Agregar observación
+        <>
+          <div className="espaciador-acciones" />
+          <div className="barra-acciones">
+            <button className="boton boton-sutil boton-alto" onClick={finalizar} disabled={accion.isPending || cola.length > 0}>
+              {cola.length > 0 ? 'Enviando…' : 'Finalizar revisión'}
             </button>
-          )}
-        </section>
+            <button className="boton boton-primario boton-alto" onClick={() => setFormulario(true)}>
+              <Icono nombre="mas" />
+              Observación
+            </button>
+          </div>
+        </>
       )}
 
-      <section>
-        <h2>Observaciones de esta ficha ({observaciones.length + cola.length})</h2>
-        {observaciones.length + cola.length === 0 && (
-          <p className="vacio">Sin observaciones. Puede finalizar la revisión si el recinto no presenta defectos.</p>
-        )}
-        <div className="lista-obs">
-          {cola.map((i) => (
-            <ObservacionEnCola key={i.id} item={i} alDescartar={() => descartar(i.id)} />
-          ))}
-          {[...observaciones].reverse().map((o) => (
-            <ObservacionItem key={o.id} obs={o} acciones={{ editar: editable, comprobar: true, devolver: true }} />
-          ))}
-        </div>
-      </section>
-
-      {editable && (
-        <div className="barra-inferior">
-          <button className="boton boton-exito boton-grande" onClick={finalizar} disabled={accion.isPending || cola.length > 0}>
-            {cola.length > 0 ? 'Esperando sincronización…' : 'Finalizar revisión'}
-          </button>
-        </div>
+      {formulario && editable && (
+        <ObservacionForm
+          clave={`revision:${revision.id}`}
+          titulo="Nueva observación"
+          codigo={recinto?.codigo}
+          alCerrar={() => setFormulario(false)}
+          alGuardar={async (d) => {
+            await encolar({
+              tipo: 'observacion',
+              recintoId: revision.recinto_id,
+              revisionId: revision.id,
+              especialidad: d.especialidad,
+              descripcion: d.descripcion,
+              fotos: d.fotos,
+            });
+            aviso(navigator.onLine ? 'Observación guardada' : 'Guardada en el teléfono; se enviará al tener conexión');
+          }}
+        />
       )}
     </div>
   );

@@ -1,5 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useAviso } from '../../components/Aviso';
+import { Icono } from '../../components/Icono';
+import { useEsEscritorio } from '../../components/Layout';
 import { EstadoObs } from '../../components/Observacion';
 import { useBusqueda, useCatalogo, useNombresUsuarios } from '../../lib/datos';
 import { descargar, nombreArchivo } from '../../lib/formato';
@@ -19,6 +21,40 @@ export function describirFiltros(f: FiltrosObservacion, porId: Map<string, Recin
   ];
 }
 
+/** Texto corto de los filtros activos para el resumen del panel plegado. */
+function resumenFiltros(f: FiltrosObservacion, porId: Map<string, Recinto>) {
+  const partes = [
+    f.sector && SECTORES.find((s) => s.id === f.sector)?.corto,
+    f.recinto && porId.get(f.recinto)?.codigo,
+    f.especialidad,
+    f.estado === 'pendiente' ? 'Pendientes' : f.estado === 'subsanada' ? 'Subsanadas' : null,
+    (f.desde || f.hasta) && 'Fechas',
+    f.autor && 'Autor',
+    f.texto && `«${f.texto}»`,
+  ].filter(Boolean);
+  return partes.length ? partes.join(', ') : 'Todos';
+}
+
+export function PanelFiltros({ resumen, children }: { resumen: string; children: ReactNode }) {
+  const escritorio = useEsEscritorio();
+  const [abierto, setAbierto] = useState(false);
+  return (
+    <details
+      className="panel-filtros plegable"
+      open={escritorio || abierto}
+      onToggle={(e) => !escritorio && setAbierto((e.target as HTMLDetailsElement).open)}
+    >
+      <summary>
+        <Icono nombre="filtro" tam={18} />
+        <span>Filtros</span>
+        <span className="filtros-activos">{resumen}</span>
+        <Icono nombre="abajo" tam={18} />
+      </summary>
+      {children}
+    </details>
+  );
+}
+
 export function FiltrosObs({
   filtros,
   cambiar,
@@ -34,7 +70,7 @@ export function FiltrosObs({
   return (
     <div className="filtros">
       <label>
-        Piso / sector
+        Piso o sector
         <select value={filtros.sector ?? ''} onChange={(e) => cambiar({ sector: v(e.target.value), recinto: undefined })}>
           <option value="">Todos</option>
           {SECTORES.map((s) => <option key={s.id} value={s.id}>{s.corto}</option>)}
@@ -87,6 +123,7 @@ export function FiltrosObs({
 
 export default function Informes() {
   const aviso = useAviso();
+  const escritorio = useEsEscritorio();
   const { recintos, porId } = useCatalogo();
   const usuarios = useNombresUsuarios();
   const [filtros, setFiltros] = useState<FiltrosObservacion>({});
@@ -97,6 +134,13 @@ export default function Informes() {
   const filas = useMemo(() => busqueda.data?.filas ?? [], [busqueda.data]);
   const grupos = useMemo(() => agrupar(filas, agrupacion), [filas, agrupacion]);
   const autores = useMemo(() => new Map((usuarios.data ?? []).map((u) => [u.id, u.nombre])), [usuarios.data]);
+  const total = busqueda.data?.total;
+
+  useEffect(() => {
+    if (escritorio) return;
+    document.body.classList.add('con-barra-acciones');
+    return () => document.body.classList.remove('con-barra-acciones');
+  }, [escritorio]);
 
   const cambiar = (c: Partial<FiltrosObservacion>) => setFiltros((f) => ({ ...f, ...c }));
 
@@ -113,64 +157,109 @@ export default function Informes() {
     }
   }
 
+  const botonEmitir = (
+    <button className="boton boton-primario boton-alto" onClick={() => void emitir()} disabled={generando || busqueda.isFetching || !filas.length}>
+      <Icono nombre="descarga" />
+      {generando ? 'Generando PDF…' : `Emitir PDF${total != null ? ` (${total})` : ''}`}
+    </button>
+  );
+
   return (
     <div className="informes">
-      <h1>Informes</h1>
-      <div className="filtros-rapidos">
+      <div className="pagina-cabeza">
+        <h1>Informes</h1>
+        {escritorio && botonEmitir}
+      </div>
+
+      <div className="chips" style={{ marginBottom: '0.75rem' }}>
+        <button className={`chip${!filtros.estado && Object.keys(filtros).length === 0 ? ' activo' : ''}`} onClick={() => setFiltros({})}>
+          Todas
+        </button>
         <button className={`chip${filtros.estado === 'pendiente' ? ' activo' : ''}`} onClick={() => cambiar({ estado: filtros.estado === 'pendiente' ? undefined : 'pendiente' })}>
           Solo pendientes
         </button>
-        <button className="chip" onClick={() => setFiltros({})}>Todos (quitar filtros)</button>
+        {ESPECIALIDADES.slice(0, 5).map((s) => (
+          <button key={s} className={`chip${filtros.especialidad === s ? ' activo' : ''}`} onClick={() => cambiar({ especialidad: filtros.especialidad === s ? undefined : s })}>
+            {s}
+          </button>
+        ))}
       </div>
-      <FiltrosObs filtros={filtros} cambiar={cambiar} recintos={recintos} />
 
-      <div className="barra informe-barra">
-        <label className="en-linea">
-          Agrupar por{' '}
-          <select value={agrupacion} onChange={(e) => setAgrupacion(e.target.value as Agrupacion)}>
-            <option value="recinto">Recinto</option>
-            <option value="especialidad">Especialidad</option>
-          </select>
-        </label>
-        <label className="en-linea casilla">
+      <PanelFiltros resumen={resumenFiltros(filtros, porId)}>
+        <FiltrosObs filtros={filtros} cambiar={cambiar} recintos={recintos} />
+      </PanelFiltros>
+
+      <div className="informe-opciones">
+        <span className="informe-total">
+          {total ?? '…'} observación{total === 1 ? '' : 'es'}
+        </span>
+        <div className="segmentado" role="tablist" aria-label="Agrupar por">
+          <button role="tab" aria-selected={agrupacion === 'recinto'} onClick={() => setAgrupacion('recinto')}>Por recinto</button>
+          <button role="tab" aria-selected={agrupacion === 'especialidad'} onClick={() => setAgrupacion('especialidad')}>Por especialidad</button>
+        </div>
+        <label className="casilla">
           <input type="checkbox" checked={conFotos} onChange={(e) => setConFotos(e.target.checked)} /> Incluir fotos
         </label>
-        <strong className="informe-total">{busqueda.data?.total ?? '…'} resultado(s)</strong>
-        <button className="boton boton-primario" onClick={() => void emitir()} disabled={generando || busqueda.isFetching}>
-          {generando ? 'Generando PDF…' : 'Emitir PDF'}
-        </button>
       </div>
 
-      <section className="vista-previa" aria-label="Vista previa">
-        {filas.length === 0 && !busqueda.isFetching && <p className="vacio">No hay observaciones con estos filtros.</p>}
+      <section aria-label="Vista previa del informe">
+        {filas.length === 0 && !busqueda.isFetching && <p className="vacio">No hay observaciones con estos filtros. Pruebe con «Todas».</p>}
         {[...grupos].map(([grupo, obs]) => (
           <div key={grupo} className="grupo">
-            <h3>{grupo} <span className="suave pequeño">({obs.length})</span></h3>
-            <div className="tabla-envoltura">
-              <table className="tabla">
-                <thead>
-                  <tr><th>N°</th><th>Recinto</th><th>Especialidad</th><th>Observación</th><th>Estado</th><th>Fotos</th></tr>
-                </thead>
-                <tbody>
-                  {obs.map((o) => (
-                    <tr key={o.id}>
-                      <td>{o.numero}</td>
-                      <td><strong>{o.codigo}</strong> {o.recinto_nombre}</td>
-                      <td>{o.especialidad}</td>
-                      <td>
-                        {o.descripcion}
-                        {o.comentario_inspeccion && <div className="comentario-insp">Inspección: {o.comentario_inspeccion}</div>}
-                      </td>
-                      <td><EstadoObs estado={o.estado} /></td>
-                      <td>{o.fotos.length || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <h3>
+              {grupo} <span className="suave chico">{obs.length}</span>
+            </h3>
+            {escritorio ? (
+              <div className="tabla-envoltura">
+                <table className="tabla">
+                  <thead>
+                    <tr><th>N°</th><th>Recinto</th><th>Especialidad</th><th>Observación</th><th>Estado</th><th>Fotos</th></tr>
+                  </thead>
+                  <tbody>
+                    {obs.map((o) => (
+                      <tr key={o.id}>
+                        <td className="codigo">{o.numero}</td>
+                        <td><span className="codigo">{o.codigo}</span> {o.recinto_nombre}</td>
+                        <td>{o.especialidad}</td>
+                        <td className="celda-texto">
+                          {o.descripcion}
+                          {o.comentario_inspeccion && <div className="comentario-insp">Inspección: {o.comentario_inspeccion}</div>}
+                        </td>
+                        <td><EstadoObs estado={o.estado} /></td>
+                        <td>{o.fotos.length || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="tarjetas-obs">
+                {obs.map((o) => (
+                  <div key={o.id} className={`tarjeta-obs${o.estado === 'subsanada' ? ' subsanada' : ''}`}>
+                    <div className="tarjeta-obs-cabeza">
+                      <span>
+                        <span className="obs-numero">N° {o.numero}</span>{' '}
+                        {agrupacion === 'recinto' ? <strong>{o.especialidad}</strong> : <span className="codigo">{o.codigo}</span>}
+                      </span>
+                      <EstadoObs estado={o.estado} />
+                    </div>
+                    <p>{o.descripcion}</p>
+                    {o.comentario_inspeccion && <p className="comentario-insp">Inspección: {o.comentario_inspeccion}</p>}
+                    {o.fotos.length > 0 && <p className="mini tenue">{o.fotos.length} foto{o.fotos.length > 1 ? 's' : ''}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </section>
+
+      {!escritorio && (
+        <>
+          <div className="espaciador-acciones" />
+          <div className="barra-acciones">{botonEmitir}</div>
+        </>
+      )}
     </div>
   );
 }

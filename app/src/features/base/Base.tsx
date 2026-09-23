@@ -1,23 +1,24 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAviso } from '../../components/Aviso';
+import { Icono } from '../../components/Icono';
 import { EstadoObs, ObservacionItem } from '../../components/Observacion';
 import { buscarTodas, useBusqueda, useCatalogo, useEstados, useNombresUsuarios } from '../../lib/datos';
 import { generarExcel } from '../../lib/excel';
 import { descargar, fecha, nombreArchivo } from '../../lib/formato';
-import type { FiltrosObservacion } from '../../lib/tipos';
-import { describirFiltros, FiltrosObs } from '../informes/Informes';
+import { SECTORES, type FiltrosObservacion } from '../../lib/tipos';
+import { describirFiltros, FiltrosObs, PanelFiltros } from '../informes/Informes';
 
 const POR_PAGINA = 50;
 
 const COLUMNAS: { campo?: string; texto: string }[] = [
   { campo: 'numero', texto: 'N°' },
-  { texto: 'Sector(es)' },
   { campo: 'recinto', texto: 'Recinto' },
+  { texto: 'Sector' },
   { campo: 'especialidad', texto: 'Especialidad' },
   { texto: 'Descripción' },
   { campo: 'estado', texto: 'Estado' },
-  { texto: 'Foto' },
+  { texto: 'Fotos' },
   { campo: 'autor', texto: 'Autor' },
   { campo: 'fecha', texto: 'Registro' },
   { texto: 'Última comprobación' },
@@ -32,6 +33,8 @@ function useDiferido<T>(valor: T, ms = 350) {
   }, [valor, ms]);
   return v;
 }
+
+const corto = (sector: string) => SECTORES.find((s) => s.id === sector)?.corto ?? sector;
 
 export default function Base() {
   const aviso = useAviso();
@@ -71,27 +74,34 @@ export default function Base() {
 
   return (
     <div className="base">
-      <div className="barra">
+      <div className="pagina-cabeza">
         <h1>Base de observaciones</h1>
-        <div className="acciones">
-          <button className="boton" onClick={() => void exportar(false)} disabled={exportando}>Excel · vista filtrada</button>
-          <button className="boton" onClick={() => void exportar(true)} disabled={exportando}>Excel · todo</button>
-        </div>
+        <span className="informe-total">
+          {total} observación{total === 1 ? '' : 'es'}
+          {datos.isFetching && <span className="suave chico"> · actualizando</span>}
+        </span>
+        <button className="boton boton-sutil" onClick={() => void exportar(false)} disabled={exportando}>
+          <Icono nombre="descarga" tam={20} />
+          Excel de esta vista
+        </button>
+        <button className="boton boton-primario" onClick={() => void exportar(true)} disabled={exportando}>
+          <Icono nombre="descarga" tam={20} />
+          Excel completo
+        </button>
       </div>
-      <FiltrosObs filtros={filtros} cambiar={(c) => setFiltros((f) => ({ ...f, ...c }))} recintos={recintos} />
-      <p className="suave">
-        {total} observación(es){datos.isFetching && ' · actualizando…'}
-      </p>
+      <PanelFiltros resumen="">
+        <FiltrosObs filtros={filtros} cambiar={(c) => setFiltros((f) => ({ ...f, ...c }))} recintos={recintos} />
+      </PanelFiltros>
       <div className="tabla-envoltura">
         <table className="tabla tabla-base">
           <thead>
             <tr>
               {COLUMNAS.map((c) => (
-                <th key={c.texto}>
+                <th key={c.texto} aria-sort={c.campo && orden.replace('-', '') === c.campo ? (orden.startsWith('-') ? 'descending' : 'ascending') : undefined}>
                   {c.campo ? (
                     <button className="th-orden" onClick={() => ordenar(c.campo!)}>
                       {c.texto}
-                      {orden === c.campo ? ' ▲' : orden === `-${c.campo}` ? ' ▼' : ''}
+                      {orden === c.campo ? ' ↑' : orden === `-${c.campo}` ? ' ↓' : ''}
                     </button>
                   ) : (
                     c.texto
@@ -103,24 +113,33 @@ export default function Base() {
           <tbody>
             {(datos.data?.filas ?? []).map((o) => (
               <Fragment key={o.id}>
-                <tr className={`fila-clic${abierta === o.id ? ' abierta' : ''}`} onClick={() => setAbierta(abierta === o.id ? null : o.id)}>
-                  <td>{o.numero}</td>
-                  <td className="pequeño">{o.sectores.join(' · ')}</td>
-                  <td><strong>{o.codigo}</strong> {o.recinto_nombre}</td>
+                <tr
+                  className={`fila-clic${abierta === o.id ? ' abierta' : ''}`}
+                  tabIndex={0}
+                  onClick={() => setAbierta(abierta === o.id ? null : o.id)}
+                  onKeyDown={(e) => e.key === 'Enter' && setAbierta(abierta === o.id ? null : o.id)}
+                >
+                  <td className="codigo">{o.numero}</td>
+                  <td><span className="codigo">{o.codigo}</span> {o.recinto_nombre}</td>
+                  <td className="chico">{o.sectores.map(corto).join(' y ')}</td>
                   <td>{o.especialidad}</td>
                   <td className="celda-texto">{o.descripcion}</td>
                   <td><EstadoObs estado={o.estado} /></td>
                   <td>{o.fotos.length || '—'}</td>
                   <td>{o.autor}</td>
-                  <td className="pequeño">{fecha(o.creada)}</td>
-                  <td className="pequeño">{o.comprobada_en ? `${fecha(o.comprobada_en)} · ${o.comprobador}` : '—'}</td>
+                  <td className="celda-fecha">{fecha(o.creada)}</td>
+                  <td className="celda-fecha">{o.comprobada_en ? <>{fecha(o.comprobada_en)}<br /><span className="suave">{o.comprobador}</span></> : '—'}</td>
                   <td className="celda-texto">{o.comentario_inspeccion ?? ''}</td>
                 </tr>
                 {abierta === o.id && (
                   <tr className="fila-detalle">
                     <td colSpan={COLUMNAS.length}>
-                      <ObservacionItem obs={o} acciones={{ comprobar: true, devolver: true, mostrarRecinto: true }} />
-                      <Link to={`/revision/recinto/${encodeURIComponent(o.codigo)}`}>Abrir ficha del recinto →</Link>
+                      <div style={{ maxWidth: 760 }}>
+                        <ObservacionItem obs={o} acciones={{ comprobar: true, devolver: true, mostrarRecinto: true }} />
+                        <Link to={`/revision/recinto/${encodeURIComponent(o.codigo)}`} className="volver" style={{ marginTop: '0.4rem' }}>
+                          Abrir la ficha de {o.codigo}
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 )}
@@ -128,11 +147,12 @@ export default function Base() {
             ))}
           </tbody>
         </table>
+        {total === 0 && !datos.isFetching && <p className="vacio">No hay observaciones con estos filtros.</p>}
       </div>
       <div className="paginacion">
-        <button className="boton" disabled={pagina === 0} onClick={() => setPagina((p) => p - 1)}>← Anterior</button>
+        <button className="boton boton-sutil boton-chico" disabled={pagina === 0} onClick={() => setPagina((p) => p - 1)}>Anterior</button>
         <span>Página {pagina + 1} de {paginas}</span>
-        <button className="boton" disabled={pagina + 1 >= paginas} onClick={() => setPagina((p) => p + 1)}>Siguiente →</button>
+        <button className="boton boton-sutil boton-chico" disabled={pagina + 1 >= paginas} onClick={() => setPagina((p) => p + 1)}>Siguiente</button>
       </div>
     </div>
   );

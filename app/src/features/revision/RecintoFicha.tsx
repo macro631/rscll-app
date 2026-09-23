@@ -3,7 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSesion } from '../../auth';
 import { useAviso } from '../../components/Aviso';
-import { EstadoBadge } from '../../components/Estado';
+import { Cajetin } from '../../components/Cajetin';
+import { Icono } from '../../components/Icono';
 import { ObservacionEnCola, ObservacionForm, ObservacionItem } from '../../components/Observacion';
 import { sectoresTexto } from '../../components/Recintos';
 import { api } from '../../lib/backend';
@@ -28,7 +29,7 @@ export function RecintoFicha() {
   const [abriendo, setAbriendo] = useState(false);
 
   if (isLoading || ficha.isLoading) return <p className="cargando">Cargando ficha…</p>;
-  if (!recinto) return <p className="error-texto">Recinto {codigo} no encontrado.</p>;
+  if (!recinto) return <p className="error-texto">No existe el recinto {codigo}.</p>;
   if (ficha.error || !ficha.data) return <p className="error-texto">{ficha.error?.message}</p>;
 
   const { estado, recepcion, revisiones, observaciones, movimientos } = ficha.data;
@@ -50,127 +51,141 @@ export function RecintoFicha() {
     }
   }
 
+  const acciones = (
+    <div className="acciones-principales">
+      {puede('admin', 'revisor') &&
+        (misAbiertas.length > 0 ? (
+          <button className="boton boton-primario boton-alto" onClick={() => navegar(`/revision/ficha/${misAbiertas[0]}`)}>
+            Continuar mi revisión
+          </button>
+        ) : (
+          <button className="boton boton-primario boton-alto" onClick={() => void iniciar()} disabled={abriendo}>
+            {abriendo ? 'Abriendo…' : 'Iniciar revisión'}
+          </button>
+        ))}
+      {puede('inspeccion') && estado.estado === 'listo' && (
+        <button
+          className="boton boton-recepcion boton-alto"
+          disabled={accion.isPending}
+          onClick={() => accion.mutate({ fn: 'recepcionar', args: { p_recinto: recinto.id }, ok: `${recinto.codigo} recepcionado` })}
+        >
+          <Icono nombre="check" />
+          Recepcionar
+        </button>
+      )}
+      {puede('inspeccion') && (estado.estado === 'listo' || estado.estado === 'recepcionado') && (
+        <button className="boton boton-sutil boton-alto" onClick={() => setDefecto(true)}>
+          Registrar defecto nuevo
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <div className="ficha">
-      <header className="ficha-cabecera">
-        <Link to="/revision" className="volver">← Revisión</Link>
-        <h1>
-          <span className="ficha-codigo">{recinto.codigo}</span> {recinto.nombre}
-        </h1>
-        <p className="suave">
-          {sectoresTexto(recinto)} · {recinto.tipo}
-          {superficie != null && <> · {superficie} m²</>}
+      <Link to="/revision" className="volver">
+        <Icono nombre="volver" tam={18} />
+        Revisión
+      </Link>
+      <Cajetin
+        codigo={recinto.codigo}
+        nombre={recinto.nombre}
+        estado={estado.estado}
+        datos={[
+          { etiqueta: 'Sector', valor: sectoresTexto(recinto) },
+          { etiqueta: 'Tipo', valor: recinto.tipo },
+          ...(superficie != null ? [{ etiqueta: 'Superficie', valor: `${superficie} m²` }] : []),
+        ]}
+      >
+        <span className="chico">
+          {estado.pendientes} pendiente{estado.pendientes === 1 ? '' : 's'} · {estado.subsanadas} subsanada{estado.subsanadas === 1 ? '' : 's'}
+        </span>
+      </Cajetin>
+      {recepcion && (
+        <p className="nota nota-ok chico">
+          Recepcionado por {recepcion.inspector} el {fecha(recepcion.fecha)}. Calidad prepara el acta de recepción.
         </p>
-        <div className="fila-badges">
-          <EstadoBadge estado={estado.estado} />
-          <span className="suave">
-            {estado.pendientes} pendiente(s) · {estado.subsanadas} subsanada(s)
-          </span>
-        </div>
-        {recepcion && (
-          <p className="nota nota-exito">
-            Recepcionado por {recepcion.inspector} el {fecha(recepcion.fecha)}. Calidad prepara el acta de recepción.
-          </p>
-        )}
-      </header>
+      )}
+      {acciones}
 
-      <section className="acciones-principales">
-        {puede('admin', 'revisor') &&
-          (misAbiertas.length > 0 ? (
-            <button className="boton boton-primario boton-grande" onClick={() => navegar(`/revision/ficha/${misAbiertas[0]}`)}>
-              Continuar mi revisión
-            </button>
-          ) : (
-            <button className="boton boton-primario boton-grande" onClick={() => void iniciar()} disabled={abriendo}>
-              {abriendo ? 'Abriendo…' : 'Iniciar revisión'}
-            </button>
-          ))}
-        {puede('inspeccion') && estado.estado === 'listo' && (
-          <button
-            className="boton boton-recepcion boton-grande"
-            disabled={accion.isPending}
-            onClick={() => accion.mutate({ fn: 'recepcionar', args: { p_recinto: recinto.id }, ok: `${recinto.codigo} recepcionado` })}
-          >
-            ✔ Recepcionar
-          </button>
-        )}
-        {puede('inspeccion') && (estado.estado === 'listo' || estado.estado === 'recepcionado') && !defecto && (
-          <button className="boton" onClick={() => setDefecto(true)}>
-            Registrar defecto sin observación previa
-          </button>
-        )}
-      </section>
+      <div className="ficha-cuerpo">
+        <div>
+          <div className="seccion-titulo">
+            <h2>Pendientes</h2>
+            <span className="suave chico">{pendientes.length + colaInspeccion.length}</span>
+          </div>
+          <div className="lista-obs">
+            {colaInspeccion.map((i) => (
+              <ObservacionEnCola key={i.id} item={i} alDescartar={() => descartar(i.id)} />
+            ))}
+            {pendientes.length === 0 && colaInspeccion.length === 0 && <p className="vacio">No hay observaciones pendientes.</p>}
+            {pendientes.map((o) => (
+              <ObservacionItem key={o.id} obs={o} acciones={{ comprobar: true, devolver: true }} />
+            ))}
+          </div>
+
+          {subsanadas.length > 0 && (
+            <details className="plegable" style={{ marginTop: '1rem' }}>
+              <summary>
+                <h2>Subsanadas</h2>
+                <span className="suave chico">{subsanadas.length}</span>
+                <Icono nombre="abajo" tam={18} />
+              </summary>
+              <div className="lista-obs">
+                {subsanadas.map((o) => (
+                  <ObservacionItem key={o.id} obs={o} acciones={{ devolver: true }} />
+                ))}
+              </div>
+            </details>
+          )}
+        </div>
+
+        <aside className="ficha-lateral">
+          <div className="seccion-titulo">
+            <h2>Fichas de revisión</h2>
+            <span className="suave chico">{revisiones.length}</span>
+          </div>
+          {revisiones.length === 0 && <p className="suave chico">Aún nadie ha revisado este recinto.</p>}
+          <div className="lista-fichas">
+            {revisiones.map((r) => (
+              <FilaFicha key={r.id} r={r} esAdmin={perfil?.rol === 'admin'} />
+            ))}
+          </div>
+
+          {movimientos.length > 0 && (
+            <details className="plegable" style={{ marginTop: '1rem' }}>
+              <summary>
+                <h2>Movimientos</h2>
+                <Icono nombre="abajo" tam={18} />
+              </summary>
+              <ul className="movimientos">
+                {movimientos.map((m, i) => (
+                  <li key={i}>
+                    <time>{fecha(m.fecha)}</time>
+                    {ACCIONES[m.accion] ?? m.accion}
+                    {m.actor && <span className="suave">, {m.actor}</span>}
+                    {m.comentario && <span className="suave"> — {m.comentario}</span>}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </aside>
+      </div>
 
       {defecto && (
-        <section className="tarjeta">
-          <h2>Observación de Inspección</h2>
-          <p className="suave pequeño">
-            Para un defecto que ninguna observación registrada cubre. Si ya existe una observación, comente sobre ella.
-          </p>
-          <ObservacionForm
-            clave={`inspeccion:${recinto.id}`}
-            textoBoton="Registrar y devolver a pendiente"
-            alCancelar={() => setDefecto(false)}
-            alGuardar={async (d) => {
-              await encolar({ tipo: 'inspeccion', recintoId: recinto.id, especialidad: d.especialidad, descripcion: d.descripcion, fotos: d.fotos });
-              setDefecto(false);
-              aviso('Observación de Inspección registrada');
-            }}
-          />
-        </section>
-      )}
-
-      <section>
-        <h2>Pendientes ({pendientes.length + colaInspeccion.length})</h2>
-        <div className="lista-obs">
-          {colaInspeccion.map((i) => (
-            <ObservacionEnCola key={i.id} item={i} alDescartar={() => descartar(i.id)} />
-          ))}
-          {pendientes.length === 0 && colaInspeccion.length === 0 && <p className="vacio">Sin observaciones pendientes.</p>}
-          {pendientes.map((o) => (
-            <ObservacionItem key={o.id} obs={o} acciones={{ comprobar: true, devolver: true }} />
-          ))}
-        </div>
-      </section>
-
-      {subsanadas.length > 0 && (
-        <section>
-          <details>
-            <summary><h2 className="en-linea">Subsanadas ({subsanadas.length})</h2></summary>
-            <div className="lista-obs">
-              {subsanadas.map((o) => (
-                <ObservacionItem key={o.id} obs={o} acciones={{ devolver: true }} />
-              ))}
-            </div>
-          </details>
-        </section>
-      )}
-
-      <section>
-        <h2>Fichas de revisión ({revisiones.length})</h2>
-        {revisiones.length === 0 && <p className="vacio">Aún no hay revisiones de este recinto.</p>}
-        <div className="lista-fichas">
-          {revisiones.map((r) => (
-            <FilaFicha key={r.id} r={r} esAdmin={perfil?.rol === 'admin'} />
-          ))}
-        </div>
-      </section>
-
-      {movimientos.length > 0 && (
-        <section>
-          <details>
-            <summary><h2 className="en-linea">Movimientos</h2></summary>
-            <ul className="movimientos">
-              {movimientos.map((m, i) => (
-                <li key={i}>
-                  <span className="suave pequeño">{fecha(m.fecha)}</span> {ACCIONES[m.accion] ?? m.accion}
-                  {m.actor && <span className="suave"> · {m.actor}</span>}
-                  {m.comentario && <span className="suave"> — {m.comentario}</span>}
-                </li>
-              ))}
-            </ul>
-          </details>
-        </section>
+        <ObservacionForm
+          clave={`inspeccion:${recinto.id}`}
+          titulo="Defecto nuevo de Inspección"
+          codigo={recinto.codigo}
+          textoGuardar="Registrar y devolver"
+          permitirOtra={false}
+          alCerrar={() => setDefecto(false)}
+          alGuardar={async (d) => {
+            await encolar({ tipo: 'inspeccion', recintoId: recinto.id, especialidad: d.especialidad, descripcion: d.descripcion, fotos: d.fotos });
+            aviso('Defecto registrado; el recinto vuelve a pendiente');
+          }}
+        />
       )}
     </div>
   );
@@ -190,34 +205,37 @@ function FilaFicha({ r, esAdmin }: { r: Revision; esAdmin: boolean }) {
   }
 
   return (
-    <div className={`fila-ficha condicion-borde-${r.condicion}`}>
+    <div className="fila-ficha">
       <div className="fila-ficha-texto">
         <Link to={`/revision/ficha/${r.id}`}>
-          <strong>{r.autor}</strong>
+          {r.autor}
           {r.origen === 'inspeccion' && <span className="etiqueta">Inspección</span>}
         </Link>
-        <span className="suave pequeño">
+        <span className="suave mini">
           {fecha(r.inicio)}
-          {r.fin && <> → {fecha(r.fin)}</>} · {r.observaciones} obs. · {r.pendientes} pend.
+          {r.fin && <> → {fecha(r.fin)}</>}
         </span>
-        {r.condicion === 'anulada' && <span className="pequeño peligro">Anulada: {r.motivo_anulacion}</span>}
+        <span className="suave mini">
+          {r.observaciones} observación{r.observaciones === 1 ? '' : 'es'}, {r.pendientes} pendiente{r.pendientes === 1 ? '' : 's'}
+        </span>
+        {r.condicion === 'anulada' && <span className="mini error-texto">Anulada: {r.motivo_anulacion}</span>}
       </div>
       <span className={`condicion condicion-${r.condicion}`}>
         {r.condicion === 'abierta' ? 'Abierta' : r.condicion === 'finalizada' ? 'Finalizada' : 'Anulada'}
       </span>
-      {esAdmin && (
-        <div className="acciones">
+      {esAdmin && !anulando && (
+        <div className="acciones" style={{ flexBasis: '100%' }}>
           {r.condicion === 'finalizada' && r.origen === 'ordinaria' && (
-            <button className="boton boton-chico" disabled={accion.isPending}
+            <button className="boton boton-sutil boton-chico" disabled={accion.isPending}
               onClick={() => accion.mutate({ fn: 'reabrir_revision', args: { p_revision: r.id }, ok: 'Ficha reabierta' })}>
               Reabrir
             </button>
           )}
-          {r.condicion !== 'anulada' && !anulando && (
-            <button className="boton boton-chico" onClick={() => setAnulando(true)}>Anular</button>
+          {r.condicion !== 'anulada' && (
+            <button className="boton boton-sutil boton-chico" onClick={() => setAnulando(true)}>Anular</button>
           )}
           {r.condicion === 'anulada' && (
-            <button className="boton boton-chico" disabled={accion.isPending}
+            <button className="boton boton-sutil boton-chico" disabled={accion.isPending}
               onClick={() => accion.mutate({ fn: 'revertir_anulacion', args: { p_revision: r.id }, ok: 'Anulación revertida' })}>
               Revertir anulación
             </button>
@@ -226,10 +244,10 @@ function FilaFicha({ r, esAdmin }: { r: Revision; esAdmin: boolean }) {
       )}
       {anulando && (
         <form className="formulario fila-ficha-anular" onSubmit={anular}>
-          <input required autoFocus placeholder="Motivo de la anulación" value={motivo} onChange={(e) => setMotivo(e.target.value)} />
+          <input required autoFocus placeholder="Motivo de la anulación" aria-label="Motivo de la anulación" value={motivo} onChange={(e) => setMotivo(e.target.value)} />
           <div className="acciones">
-            <button className="boton boton-peligro" disabled={accion.isPending}>Anular ficha</button>
-            <button type="button" className="boton" onClick={() => setAnulando(false)}>Cancelar</button>
+            <button className="boton boton-peligro lleno boton-chico" disabled={accion.isPending}>Anular ficha</button>
+            <button type="button" className="boton boton-sutil boton-chico" onClick={() => setAnulando(false)}>Cancelar</button>
           </div>
         </form>
       )}

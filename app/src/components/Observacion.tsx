@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { useSesion } from '../auth';
 import { useBorrador } from '../lib/borrador';
 import { prepararFoto, type FotoCola, type ItemCola } from '../lib/cola';
@@ -6,12 +6,16 @@ import { useAccion } from '../lib/datos';
 import { fecha } from '../lib/formato';
 import { ESPECIALIDADES, type Observacion } from '../lib/tipos';
 import { FotoLocal, FotoMiniatura } from './Foto';
+import { Icono } from './Icono';
 
 export function EstadoObs({ estado }: { estado: 'pendiente' | 'subsanada' }) {
   return (
     <span className={`obs-estado obs-${estado}`}>
-      <span aria-hidden="true">{estado === 'pendiente' ? '!' : '✓'} </span>
-      {estado === 'pendiente' ? 'Pendiente' : 'Subsanada'}
+      {estado === 'pendiente' ? 'Pendiente' : (
+        <>
+          <Icono nombre="check" tam={14} /> Subsanada
+        </>
+      )}
     </span>
   );
 }
@@ -53,28 +57,28 @@ export function ObservacionItem({ obs, acciones = {} }: { obs: Observacion; acci
   return (
     <article className={`obs obs-borde-${obs.estado}`}>
       <header className="obs-cabecera">
-        <span>
+        <span className="obs-titulo">
           <span className="obs-numero">N° {obs.numero}</span>
-          {acciones.mostrarRecinto && (
-            <span className="obs-recinto"> · <strong>{obs.codigo}</strong> {obs.recinto_nombre}</span>
-          )}
+          <span className="obs-especialidad">{obs.especialidad}</span>
+          {obs.origen === 'inspeccion' && <span className="etiqueta">Inspección</span>}
         </span>
         <EstadoObs estado={obs.estado} />
       </header>
-      <p className="obs-especialidad">
-        {obs.especialidad}
-        {obs.origen === 'inspeccion' && <span className="etiqueta">Observación de Inspección</span>}
-      </p>
+      {acciones.mostrarRecinto && (
+        <p className="obs-recinto">
+          <span className="codigo">{obs.codigo}</span> {obs.recinto_nombre}
+        </p>
+      )}
 
       {modo === 'editar' ? (
-        <form className="formulario" onSubmit={guardarEdicion}>
+        <form className="formulario" onSubmit={guardarEdicion} style={{ marginTop: '0.5rem' }}>
           <select value={edicion.especialidad} onChange={(e) => setEdicion({ ...edicion, especialidad: e.target.value })} aria-label="Especialidad">
             {ESPECIALIDADES.map((s) => <option key={s}>{s}</option>)}
           </select>
           <textarea rows={3} required value={edicion.descripcion} onChange={(e) => setEdicion({ ...edicion, descripcion: e.target.value })} aria-label="Descripción" />
           <div className="acciones">
-            <button className="boton boton-primario" disabled={accion.isPending}>Guardar</button>
-            <button type="button" className="boton" onClick={() => setModo('ver')}>Cancelar</button>
+            <button className="boton boton-primario boton-chico" disabled={accion.isPending}>Guardar cambios</button>
+            <button type="button" className="boton boton-sutil boton-chico" onClick={() => setModo('ver')}>Cancelar</button>
           </div>
         </form>
       ) : (
@@ -88,8 +92,8 @@ export function ObservacionItem({ obs, acciones = {} }: { obs: Observacion; acci
       )}
 
       <p className="obs-meta">
-        {obs.autor} · {fecha(obs.creada)}
-        {obs.comprobada_en && obs.estado === 'subsanada' && <> · Comprobada por {obs.comprobador} el {fecha(obs.comprobada_en)}</>}
+        {obs.autor}, {fecha(obs.creada)}
+        {obs.comprobada_en && obs.estado === 'subsanada' && <> · comprobada por {obs.comprobador}, {fecha(obs.comprobada_en)}</>}
       </p>
 
       {obs.comentarios.length > 0 && (
@@ -106,32 +110,33 @@ export function ObservacionItem({ obs, acciones = {} }: { obs: Observacion; acci
       )}
 
       {modo === 'devolver' && (
-        <form className="formulario" onSubmit={devolver}>
+        <form className="formulario" onSubmit={devolver} style={{ marginTop: '0.6rem' }}>
           <textarea
             rows={2}
             required
             autoFocus
-            placeholder="Comentario de Inspección (por qué sigue pendiente)"
+            placeholder="Por qué sigue pendiente"
+            aria-label="Comentario de Inspección"
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
           />
           <div className="acciones">
-            <button className="boton boton-aviso" disabled={accion.isPending}>Mantener pendiente</button>
-            <button type="button" className="boton" onClick={() => setModo('ver')}>Cancelar</button>
+            <button className="boton boton-primario boton-chico" disabled={accion.isPending}>Mantener pendiente</button>
+            <button type="button" className="boton boton-sutil boton-chico" onClick={() => setModo('ver')}>Cancelar</button>
           </div>
         </form>
       )}
 
       {modo === 'eliminar' && (
         <div className="acciones confirmar-linea">
-          <span>¿Eliminar esta observación?</span>
+          <span className="chico">¿Eliminar la observación N° {obs.numero}?</span>
           <button
-            className="boton boton-peligro"
+            className="boton boton-peligro lleno boton-chico"
             onClick={() => accion.mutate({ fn: 'eliminar_observacion', args: { p_observacion: obs.id }, ok: 'Observación eliminada' })}
           >
             Eliminar
           </button>
-          <button className="boton" onClick={() => setModo('ver')}>No</button>
+          <button className="boton boton-sutil boton-chico" onClick={() => setModo('ver')}>No</button>
         </div>
       )}
 
@@ -139,22 +144,29 @@ export function ObservacionItem({ obs, acciones = {} }: { obs: Observacion; acci
         <div className="acciones">
           {puedeComprobar && (
             <button
-              className="boton boton-exito"
+              className="boton boton-ok boton-chico"
               disabled={accion.isPending}
               onClick={() => accion.mutate({ fn: 'marcar_subsanada', args: { p_observacion: obs.id }, ok: `N° ${obs.numero} marcada subsanada` })}
             >
-              ✓ Marcar subsanada
+              <Icono nombre="check" tam={18} />
+              Marcar subsanada
             </button>
           )}
           {puedeDevolver && (
-            <button className="boton" onClick={() => setModo('devolver')}>
-              {obs.estado === 'subsanada' ? 'Devolver a pendiente' : 'Comentar y mantener pendiente'}
+            <button className="boton boton-sutil boton-chico" onClick={() => setModo('devolver')}>
+              <Icono nombre="comentario" tam={18} />
+              {obs.estado === 'subsanada' ? 'Devolver a pendiente' : 'Comentar'}
             </button>
           )}
           {acciones.editar && (
             <>
-              <button className="boton" onClick={() => setModo('editar')}>Editar</button>
-              <button className="boton-texto peligro" onClick={() => setModo('eliminar')}>Eliminar</button>
+              <button className="boton boton-sutil boton-chico" onClick={() => setModo('editar')}>
+                <Icono nombre="editar" tam={18} />
+                Editar
+              </button>
+              <button className="boton-texto peligro" onClick={() => setModo('eliminar')}>
+                Eliminar
+              </button>
             </>
           )}
         </div>
@@ -168,10 +180,14 @@ export function ObservacionEnCola({ item, alDescartar }: { item: ItemCola; alDes
   return (
     <article className="obs obs-en-cola">
       <header className="obs-cabecera">
-        <span className="obs-numero">{item.observacionId ? 'Enviando fotos…' : 'Por sincronizar'}</span>
-        <span className="sync sync-pendiente">⟳ Pendiente de sincronizar</span>
+        <span className="obs-titulo">
+          <span className="obs-especialidad">{item.especialidad}</span>
+        </span>
+        <span className="sync sync-pendiente">
+          <Icono nombre="sync" tam={14} />
+          {item.observacionId ? 'Enviando fotos' : 'Por enviar'}
+        </span>
       </header>
-      {item.especialidad && <p className="obs-especialidad">{item.especialidad}</p>}
       {item.descripcion && <p className="obs-descripcion">{item.descripcion}</p>}
       {item.fotos.length > 0 && (
         <div className="fotos">
@@ -179,12 +195,41 @@ export function ObservacionEnCola({ item, alDescartar }: { item: ItemCola; alDes
         </div>
       )}
       {item.error && (
-        <p className="error-texto pequeño">
+        <p className="error-texto chico">
           Último intento: {item.error}{' '}
           <button className="boton-texto peligro" onClick={alDescartar}>Descartar</button>
         </p>
       )}
     </article>
+  );
+}
+
+/** Panel sobre la página: pantalla completa en teléfono, lateral en escritorio. */
+export function Hoja({ titulo, codigo, alCerrar, pie, children }: { titulo: string; codigo?: string; alCerrar: () => void; pie: ReactNode; children: ReactNode }) {
+  useEffect(() => {
+    const tecla = (e: KeyboardEvent) => e.key === 'Escape' && alCerrar();
+    document.addEventListener('keydown', tecla);
+    const previo = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', tecla);
+      document.body.style.overflow = previo;
+    };
+  }, [alCerrar]);
+  return (
+    <div className="hoja-fondo" onMouseDown={(e) => e.target === e.currentTarget && alCerrar()}>
+      <div className="hoja" role="dialog" aria-modal="true" aria-label={titulo}>
+        <div className="hoja-cabeza">
+          {codigo && <span className="codigo">{codigo}</span>}
+          <h2>{titulo}</h2>
+          <button className="boton boton-icono boton-sutil" style={{ border: 'none' }} onClick={alCerrar} aria-label="Cerrar">
+            <Icono nombre="cerrar" />
+          </button>
+        </div>
+        <div className="hoja-cuerpo">{children}</div>
+        <div className="hoja-pie">{pie}</div>
+      </div>
+    </div>
   );
 }
 
@@ -194,24 +239,32 @@ export interface DatosObservacion {
   fotos: FotoCola[];
 }
 
-/** Ingreso rápido en teléfono: especialidad, descripción (se puede dictar con el teclado) y fotos. */
+/** Ingreso rápido: especialidad, descripción (se puede dictar con el teclado) y fotos. */
 export function ObservacionForm({
   clave,
-  textoBoton = 'Guardar observación',
+  titulo,
+  codigo,
+  textoGuardar = 'Guardar',
+  permitirOtra = true,
   alGuardar,
-  alCancelar,
+  alCerrar,
 }: {
   clave: string;
-  textoBoton?: string;
+  titulo: string;
+  codigo?: string;
+  textoGuardar?: string;
+  permitirOtra?: boolean;
   alGuardar: (d: DatosObservacion) => Promise<void>;
-  alCancelar?: () => void;
+  alCerrar: () => void;
 }) {
   const [borrador, cambiar, limpiar] = useBorrador(clave, { especialidad: '', descripcion: '' });
   const [fotos, setFotos] = useState<FotoCola[]>([]);
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [guardadas, setGuardadas] = useState(0);
   const camara = useRef<HTMLInputElement>(null);
   const galeria = useRef<HTMLInputElement>(null);
+  const descripcion = useRef<HTMLTextAreaElement>(null);
 
   async function agregarFotos(archivos: FileList | null) {
     if (!archivos?.length) return;
@@ -220,7 +273,7 @@ export function ObservacionForm({
       const nuevas = await Promise.all([...archivos].map(prepararFoto));
       setFotos((f) => [...f, ...nuevas]);
     } catch {
-      setError('No se pudo procesar la foto');
+      setError('No se pudo procesar la foto. Intente con otra imagen.');
     } finally {
       setProcesando(false);
       if (camara.current) camara.current.value = '';
@@ -228,10 +281,9 @@ export function ObservacionForm({
     }
   }
 
-  async function guardar(e: FormEvent) {
-    e.preventDefault();
-    if (!borrador.especialidad) return setError('Elija la especialidad');
-    if (!borrador.descripcion.trim()) return setError('Escriba la descripción');
+  async function guardar(otra: boolean) {
+    if (!borrador.especialidad) return setError('Elija la especialidad.');
+    if (!borrador.descripcion.trim()) return setError('Escriba la descripción.');
     setError(null);
     setProcesando(true);
     try {
@@ -240,6 +292,9 @@ export function ObservacionForm({
       limpiar();
       cambiar({ especialidad }); // se mantiene la última especialidad para el siguiente ingreso
       setFotos([]);
+      setGuardadas((n) => n + 1);
+      if (otra) descripcion.current?.focus();
+      else alCerrar();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -248,50 +303,79 @@ export function ObservacionForm({
   }
 
   return (
-    <form className="formulario obs-form" onSubmit={guardar}>
-      <fieldset>
-        <legend>Especialidad</legend>
-        <div className="especialidades">
-          {ESPECIALIDADES.map((s) => (
-            <button
-              type="button"
-              key={s}
-              className={`chip${borrador.especialidad === s ? ' activo' : ''}`}
-              aria-pressed={borrador.especialidad === s}
-              onClick={() => cambiar({ especialidad: s })}
-            >
-              {s}
+    <Hoja
+      titulo={titulo}
+      codigo={codigo}
+      alCerrar={alCerrar}
+      pie={
+        <>
+          {permitirOtra && (
+            <button type="button" className="boton boton-sutil" disabled={procesando} onClick={() => void guardar(true)}>
+              Guardar y otra
             </button>
-          ))}
+          )}
+          <button type="button" className="boton boton-primario" disabled={procesando} onClick={() => void guardar(false)}>
+            {procesando ? 'Procesando…' : textoGuardar}
+          </button>
+        </>
+      }
+    >
+      <form className="formulario" onSubmit={(e) => { e.preventDefault(); void guardar(false); }}>
+        {guardadas > 0 && (
+          <p className="nota nota-ok chico" role="status">
+            {guardadas === 1 ? '1 observación guardada' : `${guardadas} observaciones guardadas`} en esta ficha.
+          </p>
+        )}
+        <fieldset>
+          <legend>Especialidad</legend>
+          <div className="especialidades">
+            {ESPECIALIDADES.map((s) => (
+              <button
+                type="button"
+                key={s}
+                className="opcion"
+                aria-pressed={borrador.especialidad === s}
+                onClick={() => cambiar({ especialidad: s })}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+        <label>
+          Descripción
+          <textarea
+            ref={descripcion}
+            rows={4}
+            value={borrador.descripcion}
+            placeholder="Qué se observa y dónde. Puede dictar con el micrófono del teclado."
+            onChange={(e) => cambiar({ descripcion: e.target.value })}
+          />
+        </label>
+        <div className="campo">
+          <span>Fotos {fotos.length > 0 && <span className="suave">({fotos.length})</span>}</span>
+          {fotos.length > 0 && (
+            <div className="fotos">
+              {fotos.map((f) => (
+                <FotoLocal key={f.id} blob={f.ligera} alQuitar={() => setFotos((x) => x.filter((y) => y.id !== f.id))} />
+              ))}
+            </div>
+          )}
+          <div className="fotos-botones">
+            <button type="button" className="boton boton-sutil" onClick={() => camara.current?.click()} disabled={procesando}>
+              <Icono nombre="camara" />
+              Tomar foto
+            </button>
+            <button type="button" className="boton boton-sutil" onClick={() => galeria.current?.click()} disabled={procesando}>
+              <Icono nombre="galeria" />
+              Galería
+            </button>
+          </div>
+          <input ref={camara} type="file" accept="image/*" capture="environment" hidden onChange={(e) => void agregarFotos(e.target.files)} />
+          <input ref={galeria} type="file" accept="image/*" multiple hidden onChange={(e) => void agregarFotos(e.target.files)} />
         </div>
-      </fieldset>
-      <label>
-        Descripción
-        <textarea
-          rows={3}
-          value={borrador.descripcion}
-          placeholder="Describa la observación (puede dictar con el micrófono del teclado)"
-          onChange={(e) => cambiar({ descripcion: e.target.value })}
-        />
-      </label>
-      <div className="fotos">
-        {fotos.map((f) => (
-          <FotoLocal key={f.id} blob={f.ligera} alQuitar={() => setFotos((x) => x.filter((y) => y.id !== f.id))} />
-        ))}
-      </div>
-      <div className="acciones">
-        <button type="button" className="boton" onClick={() => camara.current?.click()} disabled={procesando}>📷 Cámara</button>
-        <button type="button" className="boton" onClick={() => galeria.current?.click()} disabled={procesando}>🖼 Galería</button>
-        <input ref={camara} type="file" accept="image/*" capture="environment" hidden onChange={(e) => void agregarFotos(e.target.files)} />
-        <input ref={galeria} type="file" accept="image/*" multiple hidden onChange={(e) => void agregarFotos(e.target.files)} />
-      </div>
-      {error && <p className="error-texto" role="alert">{error}</p>}
-      <div className="acciones">
-        <button className="boton boton-primario boton-grande" disabled={procesando}>
-          {procesando ? 'Procesando…' : textoBoton}
-        </button>
-        {alCancelar && <button type="button" className="boton" onClick={alCancelar}>Cerrar</button>}
-      </div>
-    </form>
+        {error && <p className="error-texto" role="alert">{error}</p>}
+      </form>
+    </Hoja>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSesion } from '../../auth';
+import { Icono } from '../../components/Icono';
 import { PlantaViewer } from '../../components/PlantaViewer';
 import { coincide, FilaRecinto } from '../../components/Recintos';
 import { useCatalogo, useEstados, useMisRevisiones } from '../../lib/datos';
@@ -11,10 +12,10 @@ import { ListaExteriores, SelectorSector, useSectorRecordado } from '../inicio/I
 type Vista = 'nueva' | 'pendientes' | 'listos' | 'devueltos' | 'recepcionados' | 'todos';
 
 const FILTROS: Record<Vista, { texto: string; cumple: (e: EstadoFila | undefined) => boolean }> = {
-  nueva: { texto: 'Nueva revisión', cumple: (e) => !e || e.estado === 'sin_revisar' },
+  nueva: { texto: 'Sin revisar', cumple: (e) => !e || e.estado === 'sin_revisar' },
   pendientes: { texto: 'Con pendientes', cumple: (e) => e?.estado === 'pendiente' },
   listos: { texto: 'Listos para inspeccionar', cumple: (e) => e?.estado === 'listo' },
-  devueltos: { texto: 'Devueltos pendientes', cumple: (e) => e?.estado === 'pendiente' && e.devueltas > 0 },
+  devueltos: { texto: 'Devueltos', cumple: (e) => e?.estado === 'pendiente' && e.devueltas > 0 },
   recepcionados: { texto: 'Recepcionados', cumple: (e) => e?.estado === 'recepcionado' },
   todos: { texto: 'Todos', cumple: () => true },
 };
@@ -52,71 +53,89 @@ export function Revision() {
 
   return (
     <div className="revision">
-      {!!mis.data?.length && (
-        <section className="continuar">
-          <h2>Continuar mi revisión</h2>
-          <div className="tarjetas">
-            {mis.data.map((m) => (
-              <button key={m.id} className="tarjeta tarjeta-continuar" onClick={() => navegar(`/revision/ficha/${m.id}`)}>
-                <span>
-                  <strong>{m.codigo}</strong> · {m.nombre}
-                </span>
-                <span className="suave pequeño">
-                  Desde {fecha(m.inicio)} · {m.observaciones} observación(es)
-                </span>
+      <div className="herramientas">
+        <div className="herramientas-fila">
+          <div className="campo-icono">
+            <Icono nombre="buscar" tam={20} />
+            <input
+              type="search"
+              placeholder="Buscar"
+              aria-label="Buscar recinto por código o nombre"
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+            />
+          </div>
+          {modo === 'lista' && (
+            <select value={sectorFiltro} onChange={(e) => setSectorFiltro(e.target.value)} aria-label="Sector">
+              <option value="">Todo</option>
+              {SECTORES.map((s) => (
+                <option key={s.id} value={s.id}>{s.corto}</option>
+              ))}
+            </select>
+          )}
+          <div className="segmentado" role="tablist" aria-label="Vista" style={{ flex: 'none' }}>
+            <button role="tab" aria-selected={modo === 'lista'} aria-label="Lista" title="Lista" onClick={() => setModo('lista')}>
+              <Icono nombre="lista" tam={20} />
+            </button>
+            <button role="tab" aria-selected={modo === 'planta'} aria-label="Planta" title="Planta" onClick={() => setModo('planta')}>
+              <Icono nombre="planta" tam={20} />
+            </button>
+          </div>
+        </div>
+        {modo === 'lista' ? (
+          <div className="chips" role="tablist" aria-label="Filtro">
+            {vistas.map((v) => (
+              <button key={v} role="tab" aria-selected={vista === v} className={`chip${vista === v ? ' activo' : ''}`} onClick={() => setVista(v)}>
+                {FILTROS[v].texto} <span className="chip-num">{conteo(v)}</span>
               </button>
             ))}
           </div>
+        ) : (
+          <SelectorSector sector={sectorPlanta} onCambiar={setSectorPlanta} />
+        )}
+      </div>
+
+      {!!mis.data?.length && modo === 'lista' && (
+        <section className="continuar" aria-label="Mis revisiones abiertas">
+          <h2>Continuar mi revisión</h2>
+          {mis.data.map((m) => (
+            <button key={m.id} className="tarjeta-continuar" onClick={() => navegar(`/revision/ficha/${m.id}`)}>
+              <span className="codigo">{m.codigo}</span>
+              <span>
+                <strong className="fila-recinto-nombre">{m.nombre}</strong>
+                <span className="fila-recinto-sub">
+                  Desde {fecha(m.inicio)} · {m.observaciones} observación{m.observaciones === 1 ? '' : 'es'}
+                </span>
+              </span>
+              <Icono nombre="volver" tam={20} className="girar" />
+            </button>
+          ))}
         </section>
       )}
 
-      <section>
-        <div className="filtros-rapidos" role="tablist">
-          {vistas.map((v) => (
-            <button key={v} role="tab" aria-selected={vista === v} className={`chip${vista === v ? ' activo' : ''}`} onClick={() => setVista(v)}>
-              {FILTROS[v].texto} <span className="chip-num">{conteo(v)}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="barra">
-          <input
-            type="search"
-            placeholder="Buscar por código o nombre"
-            aria-label="Buscar por código o nombre"
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-          />
-          <select value={sectorFiltro} onChange={(e) => setSectorFiltro(e.target.value)} aria-label="Piso o sector">
-            <option value="">Todos los sectores</option>
-            {SECTORES.map((s) => (
-              <option key={s.id} value={s.id}>{s.corto}</option>
-            ))}
-          </select>
-          <div className="alternar">
-            <button className={modo === 'lista' ? 'activo' : ''} onClick={() => setModo('lista')}>Lista</button>
-            <button className={modo === 'planta' ? 'activo' : ''} onClick={() => setModo('planta')}>Planta</button>
-          </div>
-        </div>
-
-        {modo === 'lista' ? (
+      {modo === 'lista' ? (
+        lista.length === 0 ? (
+          <p className="vacio">No hay recintos con este filtro.</p>
+        ) : (
           <div className="lista-recintos">
-            {lista.length === 0 && <p className="vacio">No hay recintos con este filtro.</p>}
             {lista.map((r) => (
               <FilaRecinto key={r.id} recinto={r} estado={mapa.get(r.id)} onAbrir={() => abrir(r)} />
             ))}
           </div>
-        ) : (
-          <>
-            <SelectorSector sector={sectorPlanta} onCambiar={setSectorPlanta} />
-            {sectorActual.archivo ? (
-              <PlantaViewer key={sectorActual.id} sector={sectorActual} estados={mapa} porId={porId} modo="seleccion" onAbrir={abrir} />
-            ) : (
-              <ListaExteriores recintos={recintos} estados={mapa} onAbrir={abrir} />
-            )}
-          </>
-        )}
-      </section>
+        )
+      ) : sectorActual.archivo ? (
+        <PlantaViewer
+          key={sectorActual.id}
+          sector={sectorActual}
+          estados={mapa}
+          porId={porId}
+          modo="seleccion"
+          onAbrir={abrir}
+          claseMarco="modo-seleccion-marco"
+        />
+      ) : (
+        <ListaExteriores recintos={recintos} estados={mapa} onAbrir={abrir} />
+      )}
     </div>
   );
 }

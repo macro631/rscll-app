@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Indicadores, Leyenda } from '../../components/Estado';
+import { FranjaEstados, ResumenEstados } from '../../components/Estado';
+import { useEsEscritorio } from '../../components/Layout';
 import { PlantaViewer } from '../../components/PlantaViewer';
 import { FilaRecinto, RecintoBuscador } from '../../components/Recintos';
 import { useCatalogo, useEstados } from '../../lib/datos';
@@ -34,15 +35,9 @@ export function sectorPara(r: Recinto, actual: string) {
 
 export function SelectorSector({ sector, onCambiar }: { sector: string; onCambiar: (s: string) => void }) {
   return (
-    <div className="pestañas" role="tablist" aria-label="Sector">
+    <div className="segmentado" role="tablist" aria-label="Sector">
       {SECTORES.map((s) => (
-        <button
-          key={s.id}
-          role="tab"
-          aria-selected={sector === s.id}
-          className={`pestaña${sector === s.id ? ' activa' : ''}`}
-          onClick={() => onCambiar(s.id)}
-        >
+        <button key={s.id} role="tab" aria-selected={sector === s.id} onClick={() => onCambiar(s.id)}>
           {s.corto}
         </button>
       ))}
@@ -73,7 +68,7 @@ export function ListaExteriores({
             recinto={r}
             estado={estados.get(r.id)}
             onAbrir={onAbrir ? () => onAbrir(r) : undefined}
-            extra={r.figuras.length > 0 ? <span className="suave pequeño">También en planta</span> : undefined}
+            extra={r.figuras.length > 0 ? ' · también en la planta de Casa' : undefined}
           />
         </div>
       ))}
@@ -84,6 +79,7 @@ export function ListaExteriores({
 export function Inicio() {
   const { recintos, porId, isLoading, error } = useCatalogo();
   const { mapa } = useEstados();
+  const escritorio = useEsEscritorio();
   const [sector, setSector] = useSectorRecordado();
   const [alcance, setAlcance] = useState<'sector' | 'global'>('sector');
   const [resaltado, setResaltado] = useState<string | null>(null);
@@ -100,35 +96,44 @@ export function Inicio() {
 
   return (
     <div className="inicio">
-      <div className="inicio-principal">
-        <div className="barra">
-          <SelectorSector
-            sector={sector}
-            onCambiar={(s) => {
-              setSector(s);
-              setResaltado(null);
-            }}
-          />
-          <RecintoBuscador recintos={recintos} estados={mapa} onElegir={elegir} />
-        </div>
+      <div className="inicio-cabeza">
+        <SelectorSector
+          sector={sector}
+          onCambiar={(s) => {
+            setSector(s);
+            setResaltado(null);
+          }}
+        />
+        <RecintoBuscador recintos={recintos} estados={mapa} onElegir={elegir} placeholder="Buscar recinto por código o nombre" />
+        {!escritorio && <FranjaEstados recintos={recintos} estados={mapa} sector={sector} />}
+      </div>
+
+      <div>
         {sectorActual.archivo ? (
           <PlantaViewer key={sectorActual.id} sector={sectorActual} estados={mapa} porId={porId} resaltado={resaltado} modo="consulta" />
         ) : (
           <ListaExteriores recintos={recintos} estados={mapa} resaltado={resaltado} />
         )}
       </div>
-      <aside className="inicio-lateral">
-        <div className="alternar">
-          <button className={alcance === 'sector' ? 'activo' : ''} onClick={() => setAlcance('sector')}>
-            {sectorActual.corto}
-          </button>
-          <button className={alcance === 'global' ? 'activo' : ''} onClick={() => setAlcance('global')}>
-            Total obra
-          </button>
-        </div>
-        <Indicadores recintos={recintos} estados={mapa} sector={alcance === 'sector' ? sector : null} />
-        <Leyenda />
-      </aside>
+
+      {escritorio && (
+        <aside className="inicio-lateral">
+          <div className="segmentado" role="tablist" aria-label="Alcance de los indicadores">
+            <button role="tab" aria-selected={alcance === 'sector'} onClick={() => setAlcance('sector')}>
+              {sectorActual.corto}
+            </button>
+            <button role="tab" aria-selected={alcance === 'global'} onClick={() => setAlcance('global')}>
+              Total de la obra
+            </button>
+          </div>
+          <ResumenEstados
+            recintos={recintos}
+            estados={mapa}
+            sector={alcance === 'sector' ? sector : null}
+            titulo={alcance === 'sector' ? sectorActual.corto : 'Total de la obra'}
+          />
+        </aside>
+      )}
     </div>
   );
 }

@@ -1,30 +1,18 @@
 import { useMemo } from 'react';
-import { ESTADOS, ORDEN_ESTADOS, SECTORES, type EstadoFila, type EstadoRecinto, type Recinto } from '../lib/tipos';
+import { ESTADOS, ORDEN_ESTADOS, type EstadoFila, type EstadoRecinto, type Recinto } from '../lib/tipos';
 
+export function MarcaEstado({ estado }: { estado: EstadoRecinto }) {
+  return <span className={`estado-marca marca-${estado}`} aria-hidden="true" />;
+}
+
+/** Estado con muestra de color, trama y nombre: el color nunca es la única señal (§6.1). */
 export function EstadoBadge({ estado, corto = false }: { estado: EstadoRecinto | undefined; corto?: boolean }) {
   const e = estado ?? 'sin_revisar';
   return (
-    <span className={`badge badge-${e}`}>
-      <span aria-hidden="true" className="badge-icono">{ESTADOS[e].icono}</span>
+    <span className={`estado estado-${e}`}>
+      <MarcaEstado estado={e} />
       {corto ? ESTADOS[e].corto : ESTADOS[e].nombre}
     </span>
-  );
-}
-
-export function Leyenda() {
-  return (
-    <details className="leyenda" open>
-      <summary>Leyenda</summary>
-      <ul>
-        {ORDEN_ESTADOS.map((e) => (
-          <li key={e}>
-            <span className={`muestra muestra-${e}`} aria-hidden="true" />
-            <span className="badge-icono" aria-hidden="true">{ESTADOS[e].icono}</span>
-            {ESTADOS[e].nombre}
-          </li>
-        ))}
-      </ul>
-    </details>
   );
 }
 
@@ -49,44 +37,67 @@ export function contar(recintos: Recinto[], estados: Map<string, EstadoFila>, se
   return { total, porEstado, observacionesPendientes };
 }
 
-export function Indicadores({
-  recintos,
-  estados,
-  sector,
-}: {
+interface PropsConteo {
   recintos: Recinto[];
   estados: Map<string, EstadoFila>;
   sector: string | null;
-}) {
+}
+
+// Rótulos de la franja con guiones opcionales (U+00AD) para que corten bien en celdas angostas.
+const ROTULO_FRANJA = {
+  sin_revisar: 'Sin revisar',
+  en_revision: 'En revisión',
+  pendiente: 'Con pen­dientes',
+  listo: 'Listos',
+  recepcionado: 'Recepcio­nados',
+} as const;
+
+/** Franja compacta (teléfono): cuenta por estado y a la vez hace de leyenda. */
+export function FranjaEstados({ recintos, estados, sector }: PropsConteo) {
   const c = useMemo(() => contar(recintos, estados, sector), [recintos, estados, sector]);
-  const nombreSector = sector ? SECTORES.find((s) => s.id === sector)?.corto : null;
   return (
-    <section className="indicadores" aria-label="Indicadores">
-      <p className="indicadores-filtro">
-        {nombreSector ? (
-          <>Filtro: <strong>{nombreSector}</strong></>
-        ) : (
-          <>Total de la obra</>
-        )}
-      </p>
-      <div className="indicadores-grilla">
-        <div className="indicador">
-          <span className="indicador-valor">{c.total}</span>
-          <span className="indicador-nombre">Unidades</span>
+    <div className="franja" role="group" aria-label={`Recintos por estado (${c.total} unidades)`}>
+      {ORDEN_ESTADOS.map((e) => (
+        <div key={e} title={ESTADOS[e].nombre}>
+          <span className="franja-num">
+            <span className={`estado-marca marca-${e}`} aria-hidden="true" />
+            {c.porEstado[e]}
+          </span>
+          <span className="franja-nombre">{ROTULO_FRANJA[e]}</span>
         </div>
+      ))}
+      <div className="franja-obs">
+        <span className="franja-num">{c.observacionesPendientes}</span>
+        <span className="franja-nombre">Obs. pend.</span>
+      </div>
+    </div>
+  );
+}
+
+/** Resumen (escritorio): leyenda con cuentas y proporción por estado. */
+export function ResumenEstados({ recintos, estados, sector, titulo }: PropsConteo & { titulo: string }) {
+  const c = useMemo(() => contar(recintos, estados, sector), [recintos, estados, sector]);
+  return (
+    <section className="resumen" aria-label="Indicadores">
+      <div className="resumen-cabeza">
+        <h2>{titulo}</h2>
+        <span className="suave chico">{c.total} unidades</span>
+      </div>
+      <ul>
         {ORDEN_ESTADOS.map((e) => (
-          <div key={e} className={`indicador indicador-${e}`}>
-            <span className="indicador-valor">{c.porEstado[e]}</span>
-            <span className="indicador-nombre">
-              <span aria-hidden="true">{ESTADOS[e].icono} </span>
-              {ESTADOS[e].corto}
+          <li key={e}>
+            <span className={`estado-marca marca-${e}`} aria-hidden="true" />
+            <span>{ESTADOS[e].nombre}</span>
+            <span className="resumen-num">{c.porEstado[e]}</span>
+            <span className="resumen-barra" aria-hidden="true">
+              <i style={{ width: `${c.total ? (c.porEstado[e] / c.total) * 100 : 0}%` }} />
             </span>
-          </div>
+          </li>
         ))}
-        <div className="indicador indicador-obs">
-          <span className="indicador-valor">{c.observacionesPendientes}</span>
-          <span className="indicador-nombre">Observaciones pendientes</span>
-        </div>
+      </ul>
+      <div className="resumen-pie">
+        <span>Observaciones pendientes</span>
+        <span className="resumen-num">{c.observacionesPendientes}</span>
       </div>
     </section>
   );

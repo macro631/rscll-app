@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEve
 import { useQuery } from '@tanstack/react-query';
 import { TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { EstadoBadge } from './Estado';
+import { Icono } from './Icono';
 import { ESTADOS, type EstadoFila, type Recinto, type Sector } from '../lib/tipos';
 
 const DEFS = `
@@ -16,6 +17,9 @@ const DEFS = `
   </pattern>
 </defs>`;
 
+/** Ancho máximo de la planta a escala 1: en pantallas anchas las plantas largas no se agrandan de más. */
+const ANCHO_MAX = 680;
+
 /** Prepara el SVG oficial: quita su hoja de estilos (sería global al insertarlo) y agrega tramas. */
 function prepararSvg(texto: string) {
   const doc = new DOMParser().parseFromString(texto, 'image/svg+xml');
@@ -23,7 +27,7 @@ function prepararSvg(texto: string) {
   svg.querySelectorAll('style').forEach((s) => s.remove());
   svg.removeAttribute('width');
   svg.removeAttribute('height');
-  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMin meet');
   svg.setAttribute('class', 'planta-svg');
   svg.insertAdjacentHTML('afterbegin', DEFS);
   const [, , ancho, alto] = (svg.getAttribute('viewBox') ?? '0 0 1 1').split(/\s+/).map(Number);
@@ -37,9 +41,10 @@ interface Props {
   resaltado?: string | null;
   modo: 'consulta' | 'seleccion';
   onAbrir?: (r: Recinto) => void;
+  claseMarco?: string;
 }
 
-export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir }: Props) {
+export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir, claseMarco }: Props) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['svg', sector.archivo],
     queryFn: async () => {
@@ -55,17 +60,18 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir 
   const contenido = useRef<HTMLDivElement>(null);
   const zoom = useRef<ReactZoomPanPinchRef>(null);
   const inicioToque = useRef<{ x: number; y: number } | null>(null);
-  const [tam, setTam] = useState<{ w: number; h: number; cw: number; ch: number } | null>(null);
+  const [tam, setTam] = useState<{ w: number; h: number; ancho: number; alto: number } | null>(null);
   const [elegido, setElegido] = useState<string | null>(null);
 
-  // Tamaño «contener»: la planta completa cabe en el marco; el zoom permite acercarse.
+  // Escala 1 = planta al ancho del visor (con tope): se lee sin zoom y se desliza en vertical.
   useLayoutEffect(() => {
     if (!data || !marco.current) return;
     const medir = () => {
       const w = marco.current!.clientWidth;
       const h = marco.current!.clientHeight;
-      const ch = Math.min(h, w * data.proporcion);
-      setTam({ w, h, cw: ch / data.proporcion, ch });
+      // En pantallas anchas se limita también por la altura, para ver cerca de la mitad de una planta larga.
+      const ancho = w > 600 ? Math.min(w, ANCHO_MAX, Math.max(h / data.proporcion, h * 0.55)) : w;
+      setTam({ w, h, ancho, alto: ancho * data.proporcion });
     };
     medir();
     const ro = new ResizeObserver(medir);
@@ -82,8 +88,9 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir 
       const e = estados.get(id)?.estado ?? 'sin_revisar';
       el.setAttribute('class', `figura estado-${e}${id === elegido ? ' elegida' : ''}`);
       const r = porId.get(id);
-      el.setAttribute('aria-label', `${r?.codigo ?? el.dataset.code} · ${r?.nombre ?? el.dataset.name} · ${ESTADOS[e].nombre}`);
-      el.querySelector('title')?.replaceChildren(`${r?.codigo ?? ''} · ${r?.nombre ?? ''} · ${ESTADOS[e].nombre}`);
+      const texto = `${r?.codigo ?? el.dataset.code} · ${r?.nombre ?? el.dataset.name} · ${ESTADOS[e].nombre}`;
+      el.setAttribute('aria-label', texto);
+      el.querySelector('title')?.replaceChildren(texto);
     });
   }, [data, estados, porId, elegido, tam]);
 
@@ -93,23 +100,17 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir 
     setElegido(resaltado);
     const el = contenido.current?.querySelector(`path[data-room-id="${CSS.escape(resaltado)}"]`);
     if (el) {
-      const t = setTimeout(() => zoom.current?.zoomToElement(el as unknown as HTMLElement, { maxScale: 5 }), 60);
+      const t = setTimeout(() => zoom.current?.zoomToElement(el as unknown as HTMLElement, { maxScale: 3 }), 60);
       return () => clearTimeout(t);
     }
   }, [resaltado, data, tam]);
 
-  const esLarga = (data?.proporcion ?? 0) > 1.8;
-
-  function irZona(zona: 0 | 0.5 | 1) {
-    if (!tam || !zoom.current) return;
-    const s = Math.min(tam.w / tam.cw, 12);
-    const alto = tam.ch * s;
-    zoom.current.setTransform((tam.w - tam.cw * s) / 2, -(alto - tam.h) * zona, s, 300);
-  }
+  const escalaMin = tam ? Math.min(1, tam.h / tam.alto) : 1;
+  const inicialY = tam && tam.alto < tam.h ? (tam.h - tam.alto) / 2 : 0;
 
   function idDesde(target: EventTarget | null) {
     const el = (target as Element | null)?.closest?.('[data-room-id]');
-    return el ? (el as SVGElement).dataset.roomId ?? null : null;
+    return el ? ((el as SVGElement).dataset.roomId ?? null) : null;
   }
 
   function alSoltar(e: PointerEvent) {
@@ -125,9 +126,9 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir 
     const id = idDesde(e.target);
     if (!id) return;
     e.preventDefault();
-    setElegido(id);
     const r = porId.get(id);
     if (modo === 'seleccion' && r && elegido === id) onAbrir?.(r);
+    setElegido(id);
   }
 
   const recintoElegido = elegido ? porId.get(elegido) : undefined;
@@ -136,63 +137,73 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir 
 
   return (
     <div className="planta">
-      <div className="planta-marco" ref={marco}>
+      <div className={`planta-marco ${claseMarco ?? ''}`} ref={marco}>
         {isLoading && <p className="planta-mensaje">Cargando planta…</p>}
         {error && <p className="planta-mensaje error-texto">No se pudo cargar la planta. La lista de recintos sigue disponible.</p>}
         {data && tam && (
           <TransformWrapper
             ref={zoom}
-            minScale={1}
-            maxScale={14}
-            centerOnInit
+            initialScale={1}
+            initialPositionX={0}
+            initialPositionY={inicialY}
+            minScale={escalaMin}
+            maxScale={8}
             limitToBounds
+            centerZoomedOut
             doubleClick={{ mode: 'zoomIn', step: 0.7 }}
-            wheel={{ step: 0.15 }}
+            wheel={{ step: 0.12 }}
           >
             <TransformComponent wrapperStyle={{ width: '100%', height: '100%' }}>
               <div
                 ref={contenido}
                 className={`planta-contenido modo-${modo}`}
-                style={{ width: tam.cw, height: tam.ch }}
+                style={{ width: tam.w, height: tam.alto, display: 'flex', justifyContent: 'center' }}
                 onPointerDown={(e) => (inicioToque.current = { x: e.clientX, y: e.clientY })}
                 onPointerUp={alSoltar}
                 onKeyDown={alTeclear}
-                dangerouslySetInnerHTML={html}
-              />
+              >
+                <div style={{ width: tam.ancho, height: tam.alto }} dangerouslySetInnerHTML={html} />
+              </div>
             </TransformComponent>
           </TransformWrapper>
         )}
-        <div className="planta-controles">
-          <button className="boton boton-icono" onClick={() => zoom.current?.zoomIn(0.6)} aria-label="Acercar">+</button>
-          <button className="boton boton-icono" onClick={() => zoom.current?.zoomOut(0.6)} aria-label="Alejar">−</button>
-          <button className="boton boton-icono" onClick={() => zoom.current?.centerView(1, 300)} aria-label="Ver planta completa" title="Ver planta completa">⤢</button>
-          {esLarga && (
-            <>
-              <button className="boton boton-icono" onClick={() => irZona(0)} title="Zona superior" aria-label="Zona superior">↑</button>
-              <button className="boton boton-icono" onClick={() => irZona(0.5)} title="Zona central" aria-label="Zona central">•</button>
-              <button className="boton boton-icono" onClick={() => irZona(1)} title="Zona inferior" aria-label="Zona inferior">↓</button>
-            </>
-          )}
+        <div className="planta-controles" role="group" aria-label="Zoom de la planta">
+          <button onClick={() => zoom.current?.zoomIn(0.5)} aria-label="Acercar" title="Acercar">
+            <Icono nombre="mas" tam={20} />
+          </button>
+          <button onClick={() => zoom.current?.zoomOut(0.5)} aria-label="Alejar" title="Alejar">
+            <Icono nombre="menos" tam={20} />
+          </button>
+          <button onClick={() => zoom.current?.centerView(escalaMin, 250)} aria-label="Ver la planta completa" title="Ver la planta completa">
+            <Icono nombre="ajustar" tam={20} />
+          </button>
         </div>
-      </div>
-      <div className="planta-detalle" aria-live="polite">
+
         {recintoElegido ? (
-          <>
-            <div>
-              <strong>{recintoElegido.codigo}</strong> · {recintoElegido.nombre}
-              <div className="planta-detalle-estado">
+          <div className="planta-ficha" aria-live="polite">
+            <span className="codigo">{recintoElegido.codigo}</span>
+            <div className="planta-ficha-texto">
+              <strong>{recintoElegido.nombre}</strong>
+              <div className="planta-ficha-estado">
                 <EstadoBadge estado={estadoElegido?.estado} />
-                {!!estadoElegido?.pendientes && <span className="suave">{estadoElegido.pendientes} pendiente(s)</span>}
+                {!!estadoElegido?.pendientes && (
+                  <span className="mini">{estadoElegido.pendientes} pendiente{estadoElegido.pendientes > 1 ? 's' : ''}</span>
+                )}
               </div>
             </div>
+            <button className="boton-icono boton boton-sutil" style={{ border: 'none' }} onClick={() => setElegido(null)} aria-label="Cerrar">
+              <Icono nombre="cerrar" tam={20} />
+            </button>
             {modo === 'seleccion' && (
-              <button className="boton boton-primario" onClick={() => onAbrir?.(recintoElegido)}>Abrir ficha</button>
+              <div className="acciones">
+                <button className="boton boton-primario boton-ancho" onClick={() => onAbrir?.(recintoElegido)}>
+                  Abrir ficha de {recintoElegido.codigo}
+                </button>
+              </div>
             )}
-          </>
+          </div>
         ) : (
-          <span className="suave">
-            {modo === 'seleccion' ? 'Toque un recinto para seleccionarlo.' : 'Toque un recinto para ver su nombre y estado.'}
-          </span>
+          data && <span className="planta-ayuda">Toque un recinto para ver su estado</span>
         )}
       </div>
     </div>

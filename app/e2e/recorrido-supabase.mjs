@@ -67,11 +67,13 @@ try {
   await rev.getByRole('button', { name: /Iniciar revisión|Continuar mi revisión/ }).click();
   await admin.locator(`path[data-room-id="RSCLL:${RECINTO}"].estado-en_revision`).waitFor({ timeout: 15_000 });
   ok('tiempo real: la planta del Administrador pasa a azul sin recargar');
+  if (!(await rev.locator('.hoja').count())) await rev.getByRole('button', { name: 'Observación' }).click();
   await rev.getByRole('button', { name: 'Pintura' }).click();
-  await rev.getByPlaceholder(/Describa la observación/).fill('Prueba: muro con mancha');
+  await rev.getByPlaceholder(/Qué se observa/).fill('Prueba: muro con mancha');
   await rev.locator('input[type=file]:not([capture])').setInputFiles(icono);
-  await rev.locator('.obs-form .foto-mini img').waitFor();
-  await rev.getByRole('button', { name: 'Guardar observación' }).click();
+  await rev.locator('.hoja .foto-mini img').waitFor();
+  await rev.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await rev.locator('.hoja').waitFor({ state: 'detached' });
   await rev.locator('article.obs:not(.obs-en-cola)').filter({ hasText: 'Prueba: muro con mancha' }).waitFor({ timeout: 30_000 });
   await rev.locator('article.obs:not(.obs-en-cola) .fotos img').first().waitFor({ timeout: 30_000 });
   ok('observación con foto subida a Storage y mostrada con URL firmada');

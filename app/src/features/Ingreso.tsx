@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { api } from '../lib/backend';
 import { useSesion } from '../auth';
+import { Cajetin } from '../components/Cajetin';
 import { ROLES } from '../lib/tipos';
 
 export function Ingreso() {
@@ -27,45 +28,53 @@ export function Ingreso() {
   return (
     <main className="ingreso">
       <div className="ingreso-caja">
-        <p className="ingreso-codigo">RSCLL</p>
-        <h1>Reposición SubComisaría Llay Llay</h1>
-        <p className="suave">Revisión de recintos, observaciones y recepción.</p>
+        <Cajetin
+          codigo="RSCLL"
+          nombre="Reposición SubComisaría Llay Llay"
+          titulo="p"
+          datos={[
+            { etiqueta: 'Uso', valor: 'Revisión de recintos y recepción' },
+            { etiqueta: 'Emite', valor: 'Calidad' },
+          ]}
+        />
+        <div className="ingreso-cuerpo">
+          <h1 style={{ fontSize: '1.25rem' }}>Ingresar</h1>
+          {(error || errorSesion) && <p className="error-texto" role="alert">{error ?? errorSesion}</p>}
 
-        {(error || errorSesion) && <p className="error-texto" role="alert">{error ?? errorSesion}</p>}
-
-        {b.modo === 'demo' ? (
-          <>
-            <div className="nota">
-              <strong>Modo demostración.</strong> Los datos se guardan solo en este navegador. Elige con qué rol entrar.
-            </div>
-            <div className="lista-botones">
-              {b.usuariosDemo!().map((u) => (
-                <button key={u.id} className="boton boton-grande" onClick={() => b.iniciarSesion(u.id, '')}>
-                  <span>{u.nombre}</span>
-                  <span className="suave">{ROLES[u.rol]}</span>
-                </button>
-              ))}
-            </div>
-            <button className="boton-texto" onClick={() => b.reiniciarDemo!()}>
-              Reiniciar datos de demostración
-            </button>
-          </>
-        ) : (
-          <form onSubmit={entrar} className="formulario">
-            <label>
-              Correo
-              <input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
-            </label>
-            <label>
-              Clave
-              <input type="password" autoComplete="current-password" required value={clave} onChange={(e) => setClave(e.target.value)} />
-            </label>
-            <button className="boton boton-primario boton-grande" disabled={enviando}>
-              {enviando ? 'Ingresando…' : 'Ingresar'}
-            </button>
-            <p className="suave pequeño">La sesión queda recordada en este dispositivo.</p>
-          </form>
-        )}
+          {b.modo === 'demo' ? (
+            <>
+              <p className="suave chico">
+                Modo demostración: los datos quedan solo en este navegador. Elija con qué rol entrar.
+              </p>
+              <div className="lista-botones">
+                {b.usuariosDemo!().map((u) => (
+                  <button key={u.id} className="boton boton-alto" onClick={() => b.iniciarSesion(u.id, '')}>
+                    <span>{u.nombre}</span>
+                    <span className="suave chico">{ROLES[u.rol]}</span>
+                  </button>
+                ))}
+              </div>
+              <button className="boton-texto chico" onClick={() => b.reiniciarDemo!()}>
+                Reiniciar datos de demostración
+              </button>
+            </>
+          ) : (
+            <form onSubmit={entrar} className="formulario">
+              <label>
+                Correo
+                <input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              </label>
+              <label>
+                Clave
+                <input type="password" autoComplete="current-password" required value={clave} onChange={(e) => setClave(e.target.value)} />
+              </label>
+              <button className="boton boton-primario boton-alto" disabled={enviando}>
+                {enviando ? 'Ingresando…' : 'Ingresar'}
+              </button>
+              <p className="suave chico" style={{ margin: 0 }}>La sesión queda recordada en este dispositivo. Las cuentas las crea Calidad.</p>
+            </form>
+          )}
+        </div>
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, type Bucket } from '../lib/backend';
 import type { FotoRef } from '../lib/tipos';
+import { Icono } from './Icono';
 
 function useUrlFoto(bucket: Bucket, path: string | null) {
   const [url, setUrl] = useState<string | null>(null);
@@ -45,7 +46,10 @@ function FotoAmpliada({ foto, alCerrar }: { foto: FotoRef; alCerrar: () => void 
   return (
     <div className="foto-visor" role="dialog" aria-label="Foto" onClick={alCerrar}>
       {(url ?? ligera.url) && <img src={url ?? ligera.url!} alt="Foto de la observación" />}
-      <button className="boton foto-cerrar" onClick={alCerrar}>Cerrar</button>
+      <button className="boton foto-cerrar" onClick={alCerrar}>
+        <Icono nombre="cerrar" tam={20} />
+        Cerrar
+      </button>
     </div>
   );
 }
@@ -62,7 +66,7 @@ export function FotoLocal({ blob, alQuitar }: { blob: Blob; alQuitar?: () => voi
       {url && <img src={url} alt="" />}
       {alQuitar && (
         <button type="button" className="foto-quitar" onClick={alQuitar} aria-label="Quitar foto">
-          ×
+          <Icono nombre="cerrar" tam={16} />
         </button>
       )}
     </span>
