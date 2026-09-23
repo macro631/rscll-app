@@ -48,6 +48,9 @@ Deno.serve(async (req) => {
       app_metadata: { rol },
     });
     if (error) return respuesta({ error: error.message }, 400);
+    // Auth escribe app_metadata después de insertar el usuario: el trigger no alcanza a ver el rol.
+    const { error: errRol } = await admin.from('perfil').update({ rol, nombre: nombre.trim() }).eq('id', data.user.id);
+    if (errRol) return respuesta({ error: `Cuenta creada, pero no se asignó el rol: ${errRol.message}` }, 500);
     await admin.from('evento').insert({
       actor: perfil.id,
       entidad: 'perfil',

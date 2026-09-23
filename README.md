@@ -42,7 +42,8 @@ npm install
 npm run dev          # http://localhost:5173, en modo demostración
 npm test             # 22 pruebas de reglas, permisos y RLS
 npm run build && npx vite preview --port 4173
-npm run e2e          # en otra terminal: recorrido completo con Edge
+VITE_MODO=demo npm run build && npm run e2e   # recorrido en modo demostración
+node e2e/recorrido-supabase.mjs              # recorrido contra Supabase real (crea datos de prueba)
 ```
 
 En el modo demostración se entra eligiendo un rol: Calidad (Administrador), Revisor Terreno 1 o 2, o Inspección Técnica. Los datos quedan solo en ese navegador. El botón «Reiniciar datos de demostración» los borra.
@@ -58,6 +59,7 @@ En el modo demostración se entra eligiendo un rol: Calidad (Administrador), Rev
       ```sql
       update perfil set rol = 'admin', nombre = 'Calidad' where email = 'correo@ejemplo.cl';
       ```
+   Este paso siempre es necesario: toda cuenta nueva parte como Revisor. Las cuentas que después cree el Administrador desde la app reciben su rol directamente.
 5. **Publicar la función de cuentas.** Tiene dos opciones:
    - En *Edge Functions → Deploy a new function*, use el nombre `admin-usuarios` y pegue `supabase/functions/admin-usuarios/index.ts`.
    - Con la CLI de Supabase:
@@ -75,7 +77,12 @@ En el modo demostración se entra eligiendo un rol: Calidad (Administrador), Rev
    - **Environment Variables:** `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`, con los valores del paso 6.
 3. Cada `git push` a `main` publica una nueva versión, y cada rama genera una vista previa.
 
-Si se despliega **sin** las variables, el sitio queda en modo demostración. Sirve para mostrar el prototipo antes de configurar Supabase.
+**Configuración actual:** la URL y la clave *publishable* del proyecto están en `app/.env.production`, dentro del repositorio. Son valores públicos por diseño: los recibe el navegador de cada usuario, y la seguridad la dan RLS y las funciones RPC. Vercel los usa al compilar sin configurar nada más. La clave secreta nunca va en ese archivo.
+
+Para compilar el modo demostración:
+```bash
+VITE_MODO=demo npm run build
+```
 
 ## Si cambia el catálogo
 

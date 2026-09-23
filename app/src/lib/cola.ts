@@ -77,6 +77,14 @@ export function detenerCola() {
 }
 
 export async function prepararFoto(archivo: File): Promise<FotoCola> {
+  // «Original» de respaldo reducido a 2000 px (~0,6 MB): unas 1500 fotos por GB en vez de ~250 a tamaño completo.
+  const original = await imageCompression(archivo, {
+    maxWidthOrHeight: 2000,
+    maxSizeMB: 0.6,
+    useWebWorker: true,
+    fileType: 'image/jpeg',
+    initialQuality: 0.85,
+  });
   const ligera = await imageCompression(archivo, {
     maxWidthOrHeight: 1280,
     maxSizeMB: 0.25,
@@ -84,7 +92,7 @@ export async function prepararFoto(archivo: File): Promise<FotoCola> {
     fileType: 'image/jpeg',
     initialQuality: 0.8,
   });
-  return { id: crypto.randomUUID(), original: archivo, ligera };
+  return { id: crypto.randomUUID(), original, ligera };
 }
 
 export async function encolar(item: Omit<ItemCola, 'id' | 'usuario' | 'creado'> & { id?: string }) {
