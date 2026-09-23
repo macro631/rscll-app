@@ -281,9 +281,14 @@ create policy lectura on evento         for select to authenticated using (tiene
 -- Cada persona ve su propio perfil; los nombres de otros se exponen a través de las funciones de consulta.
 create policy lectura on perfil         for select to authenticated using (id = auth.uid() or tiene_rol('admin'));
 
+-- Desde 2026 Supabase no otorga permisos automáticos en tablas nuevas: se declaran aquí.
 revoke insert, update, delete on all tables in schema public from anon, authenticated;
+grant usage on schema public to authenticated, service_role;
 grant select on all tables in schema public to authenticated;
 revoke all on all tables in schema public from anon;
+-- La Edge Function admin-usuarios registra eventos con la clave de servicio.
+grant all on all tables in schema public to service_role;
+grant usage, select on all sequences in schema public to service_role;
 
 
 -- ═══════════ migrations/004_rpc.sql ═══════════
