@@ -1,0 +1,1764 @@
+[
+  {
+    "id": "RSCLL:1A",
+    "code": "1A",
+    "name": "Circulación",
+    "type": "Circulación",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 36.66
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-1A"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:2A",
+    "code": "2A",
+    "name": "Circulación",
+    "type": "Circulación",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 22.48
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-2A"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:3A",
+    "code": "3A",
+    "name": "Circulación",
+    "type": "Circulación",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 11.8
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-3A"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-01",
+    "code": "A-01",
+    "name": "Hall Acceso",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 4
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-01"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-02",
+    "code": "A-02",
+    "name": "Espera, Módulos, Atención y Área Infantil",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 44.77
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-02"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-03",
+    "code": "A-03",
+    "name": "Baño Público Acc. Universal 1",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 3.68
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-03"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-04",
+    "code": "A-04",
+    "name": "Baño Público Acc. Universal 2",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 3.66
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-04"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-05",
+    "code": "A-05",
+    "name": "Of. Empadronamiento Judiciales y Órdenes",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 13.25
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-05"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-06",
+    "code": "A-06",
+    "name": "Suboficial Guardia",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 13.07
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-06"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-07",
+    "code": "A-07",
+    "name": "Sala Custodia Temporal",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 2.09
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-07"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-08",
+    "code": "A-08",
+    "name": "Sala Rack",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 6.01
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-08"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-09",
+    "code": "A-09",
+    "name": "Of. Integración Comunitaria",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 22.62
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-09"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-10",
+    "code": "A-10",
+    "name": "Baño Func. 01",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 1.91
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-10"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-11",
+    "code": "A-11",
+    "name": "Baño Func. 02",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 1.93
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-11"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-12",
+    "code": "A-12",
+    "name": "Kitchenette",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 2.5
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-12"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-13",
+    "code": "A-13",
+    "name": "Of. Partes",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 12
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-13"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-14",
+    "code": "A-14",
+    "name": "Archivo 01",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 3.09
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-14"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-15",
+    "code": "A-15",
+    "name": "Of. Subcomisario (incluye baño y mesa de trabajo)",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 18.4
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-15"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-16",
+    "code": "A-16",
+    "name": "Sala Familia",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 17.9
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-16"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-17",
+    "code": "A-17",
+    "name": "Baño Func. 3",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 2.42
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-17"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-18",
+    "code": "A-18",
+    "name": "Baño Func. 4",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 2.42
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-18"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-19",
+    "code": "A-19",
+    "name": "Archivo 02",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 2.06
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-19"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-20",
+    "code": "A-20",
+    "name": "Sala de Armas",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 9.01
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-20"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-21",
+    "code": "A-21",
+    "name": "Of. Suboficial Interno",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 8.92
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-21"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-22",
+    "code": "A-22",
+    "name": "Bodega Interno",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 10.35
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-22"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-23",
+    "code": "A-23",
+    "name": "Sala Preparación del Turno",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 24.19
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-23"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-24",
+    "code": "A-24",
+    "name": "Custodia Permanente",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 7.23
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-24"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-25",
+    "code": "A-25",
+    "name": "Módulo Carga y Descarga Armamento",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 9.78
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-25"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-26",
+    "code": "A-26",
+    "name": "Acopio",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 2.26
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-26"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-27",
+    "code": "A-27",
+    "name": "Guardia Calabozos",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 16
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-27"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-29",
+    "code": "A-29",
+    "name": "Reconocimiento Victimario",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 4.21
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-29"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-30",
+    "code": "A-30",
+    "name": "Calabozo 1",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 7.44
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-30"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-31",
+    "code": "A-31",
+    "name": "Calabozo 2",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 7.4
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-31"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-32",
+    "code": "A-32",
+    "name": "Calabozo 3",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 7.4
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-32"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-33",
+    "code": "A-33",
+    "name": "Baños Calabozos",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 12.19
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-33"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-34",
+    "code": "A-34",
+    "name": "Sala Calderas",
+    "type": "Recinto técnico",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 19.08
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-34"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-35",
+    "code": "A-35",
+    "name": "Sala de Basuras",
+    "type": "Recinto técnico",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 14
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-35"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-36",
+    "code": "A-36",
+    "name": "Sala Generador",
+    "type": "Recinto técnico",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 19.94
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-36"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-37",
+    "code": "A-37",
+    "name": "Sala Tableros y Pad Mounted",
+    "type": "Recinto técnico",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 22
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-37"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-38",
+    "code": "A-38",
+    "name": "Patio Formación Cubierto",
+    "type": "Área cubierta",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 40.73
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-38"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-39",
+    "code": "A-39",
+    "name": "Bodega Bajo Escalera",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 6.32
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-39"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:A-40",
+    "code": "A-40",
+    "name": "Tablero Eléctrico",
+    "type": "Elemento técnico",
+    "sectors": [
+      "Piso 1 (A)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 2.09
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-A-40"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:E1",
+    "code": "E1",
+    "name": "Escalera 01",
+    "type": "Escalera",
+    "sectors": [
+      "Piso 1 (A)",
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 8.17,
+      "Piso 2 (B)": 10.6
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-E1"
+      },
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-E1"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:E2",
+    "code": "E2",
+    "name": "Escalera 02",
+    "type": "Escalera",
+    "sectors": [
+      "Piso 1 (A)",
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 1 (A)": 3.84
+    },
+    "figures": [
+      {
+        "sector": "Piso 1 (A)",
+        "elementId": "recinto-E2"
+      },
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-E2"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:1B",
+    "code": "1B",
+    "name": "Circulación",
+    "type": "Circulación",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 28.06
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-1B"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:2B",
+    "code": "2B",
+    "name": "Circulación",
+    "type": "Circulación",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 12.98
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-2B"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-01",
+    "code": "B-01",
+    "name": "Sala de Reuniones",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 18.6
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-01"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-02",
+    "code": "B-02",
+    "name": "Oficina Operaciones",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 16.02
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-02"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-03",
+    "code": "B-03",
+    "name": "Sala de Monitoreo",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 23.17
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-03"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-04",
+    "code": "B-04",
+    "name": "Archivo",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 4.98
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-04"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-05",
+    "code": "B-05",
+    "name": "Oficina PNI",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 16.02
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-05"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-06",
+    "code": "B-06",
+    "name": "Sala Eléctrica",
+    "type": "Recinto técnico",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 3.74
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-06"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-07",
+    "code": "B-07",
+    "name": "Baño Pers. 05",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 2.38
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-07"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-08",
+    "code": "B-08",
+    "name": "Baño Pers. 06",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 11.02
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-08"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-08A",
+    "code": "B-08A",
+    "name": "Hall Habitabilidad Fem.",
+    "type": "Circulación",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 3.09
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-08A"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-09",
+    "code": "B-09",
+    "name": "Dorm. PNI Solteras",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 10.99
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-09"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-10",
+    "code": "B-10",
+    "name": "Baño Dorm. PNI Solteras",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 4.02
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-10"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-11",
+    "code": "B-11",
+    "name": "Roperillos PNI Casadas",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 6.52
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-11"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-12",
+    "code": "B-12",
+    "name": "Baño PNI Casadas",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 3.37
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-12"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-13",
+    "code": "B-13",
+    "name": "Casino",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 70.83
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-13"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-14",
+    "code": "B-14",
+    "name": "Cocina",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 15.43
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-14"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-15",
+    "code": "B-15",
+    "name": "Bodega Insumos",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 5.03
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-15"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-16",
+    "code": "B-16",
+    "name": "Bodega Materiales",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 3.02
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-16"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-17",
+    "code": "B-17",
+    "name": "Área Sucia",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 5.02
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-17"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-18",
+    "code": "B-18",
+    "name": "Área Acopio",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 2.16
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-18"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-19",
+    "code": "B-19",
+    "name": "Hall Baño Pers. Casino",
+    "type": "Circulación",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 4.51
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-19"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-20",
+    "code": "B-20",
+    "name": "Baño Pers. Casino Fem.",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 3.29
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-20"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-21",
+    "code": "B-21",
+    "name": "Baño Pers. Casino Masc.",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 3.29
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-21"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-22",
+    "code": "B-22",
+    "name": "Lavandería",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 7.59
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-22"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-23",
+    "code": "B-23",
+    "name": "Roperillo PNI Masc.",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 5.23
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-23"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-24",
+    "code": "B-24",
+    "name": "Baño PNS Masc.",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 3.61
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-24"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-25",
+    "code": "B-25",
+    "name": "Roperillo PNI Casados",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 50.45
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-25"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-26",
+    "code": "B-26",
+    "name": "Baños PNI Casados",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 15.43
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-26"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-27",
+    "code": "B-27",
+    "name": "Duchas PNI Casados",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 13.88
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-27"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-28",
+    "code": "B-28",
+    "name": "Dorm. PNI Solteros",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 74.74
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-28"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-29",
+    "code": "B-29",
+    "name": "Baños PNI Solteros",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 10.92
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-29"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-30",
+    "code": "B-30",
+    "name": "Duchas PNI Solteros",
+    "type": "Recinto",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 9.93
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-30"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-31",
+    "code": "B-31",
+    "name": "Tab. Elect.",
+    "type": "Elemento técnico",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 0.68
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-31"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:B-32",
+    "code": "B-32",
+    "name": "Sala Racks",
+    "type": "Recinto técnico",
+    "sectors": [
+      "Piso 2 (B)"
+    ],
+    "areas": {
+      "Piso 2 (B)": 6.02
+    },
+    "figures": [
+      {
+        "sector": "Piso 2 (B)",
+        "elementId": "recinto-B-32"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:1C",
+    "code": "1C",
+    "name": "Circulación",
+    "type": "Circulación",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 7.74
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-1C"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-01",
+    "code": "C-01",
+    "name": "Living Comedor",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 25.79
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-01"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-02",
+    "code": "C-02",
+    "name": "Baño 1",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 3.79
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-02"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-03",
+    "code": "C-03",
+    "name": "Baño 2",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 4.21
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-03"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-04",
+    "code": "C-04",
+    "name": "Closet Walk In",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 5.2
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-04"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-05",
+    "code": "C-05",
+    "name": "Dormitorio 1",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 15.4
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-05"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-06",
+    "code": "C-06",
+    "name": "Terraza",
+    "type": "Área exterior",
+    "sectors": [
+      "Casa (C)",
+      "Exterior (D)"
+    ],
+    "areas": {
+      "Casa (C)": 3.81
+    },
+    "figures": []
+  },
+  {
+    "id": "RSCLL:C-07",
+    "code": "C-07",
+    "name": "Dormitorio 3",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 7.21
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-07"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-08",
+    "code": "C-08",
+    "name": "Dormitorio 2",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 7.21
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-08"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-09",
+    "code": "C-09",
+    "name": "Cocina",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 9.37
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-09"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-10",
+    "code": "C-10",
+    "name": "Loggia",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 8.21
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-10"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-11",
+    "code": "C-11",
+    "name": "Bodega",
+    "type": "Recinto",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 3.42
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-11"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-12",
+    "code": "C-12",
+    "name": "Patio Techado",
+    "type": "Área cubierta",
+    "sectors": [
+      "Casa (C)"
+    ],
+    "areas": {
+      "Casa (C)": 15.31
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-12"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-13",
+    "code": "C-13",
+    "name": "Estacionamiento",
+    "type": "Área exterior",
+    "sectors": [
+      "Casa (C)",
+      "Exterior (D)"
+    ],
+    "areas": {
+      "Casa (C)": 16.28
+    },
+    "figures": [
+      {
+        "sector": "Casa (C)",
+        "elementId": "recinto-C-13"
+      }
+    ]
+  },
+  {
+    "id": "RSCLL:C-14",
+    "code": "C-14",
+    "name": "Acceso",
+    "type": "Área exterior",
+    "sectors": [
+      "Casa (C)",
+      "Exterior (D)"
+    ],
+    "areas": {
+      "Casa (C)": 13.62
+    },
+    "figures": []
+  },
+  {
+    "id": "RSCLL:D-01",
+    "code": "D-01",
+    "name": "Circulación vehicular lateral — Fachada Sur",
+    "type": "Área exterior",
+    "sectors": [
+      "Exterior (D)"
+    ],
+    "areas": {},
+    "figures": []
+  },
+  {
+    "id": "RSCLL:D-02",
+    "code": "D-02",
+    "name": "Pasillo exterior — Fachada Norte",
+    "type": "Área exterior",
+    "sectors": [
+      "Exterior (D)"
+    ],
+    "areas": {},
+    "figures": []
+  },
+  {
+    "id": "RSCLL:D-03",
+    "code": "D-03",
+    "name": "Estacionamiento exterior",
+    "type": "Área exterior",
+    "sectors": [
+      "Exterior (D)"
+    ],
+    "areas": {},
+    "figures": []
+  },
+  {
+    "id": "RSCLL:D-04",
+    "code": "D-04",
+    "name": "Estanque de acumulación",
+    "type": "Elemento técnico",
+    "sectors": [
+      "Exterior (D)"
+    ],
+    "areas": {},
+    "figures": []
+  },
+  {
+    "id": "RSCLL:D-05",
+    "code": "D-05",
+    "name": "Cubierta edificio principal",
+    "type": "Cubierta",
+    "sectors": [
+      "Exterior (D)"
+    ],
+    "areas": {},
+    "figures": []
+  },
+  {
+    "id": "RSCLL:D-06",
+    "code": "D-06",
+    "name": "Cubierta casa",
+    "type": "Cubierta",
+    "sectors": [
+      "Exterior (D)"
+    ],
+    "areas": {},
+    "figures": []
+  }
+]

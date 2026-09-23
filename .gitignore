@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dev-dist/
+.env
+.env.*
+!.env.example
+app/e2e/capturas/
+supabase/.temp/
+supabase/.branches/
+*.log
+.DS_Store
