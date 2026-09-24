@@ -5,6 +5,7 @@ import { prepararFoto, type FotoCola, type ItemCola } from '../lib/cola';
 import { useAccion } from '../lib/datos';
 import { fecha } from '../lib/formato';
 import { ESPECIALIDADES, type Observacion } from '../lib/tipos';
+import { Camara } from './Camara';
 import { FotoLocal, FotoMiniatura } from './Foto';
 import { Icono } from './Icono';
 
@@ -289,6 +290,7 @@ export function ObservacionForm({
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [guardadas, setGuardadas] = useState(0);
+  const [camaraAbierta, setCamaraAbierta] = useState(false);
   const camara = useRef<HTMLInputElement>(null);
   const galeria = useRef<HTMLInputElement>(null);
   const descripcion = useRef<HTMLTextAreaElement>(null);
@@ -385,7 +387,7 @@ export function ObservacionForm({
             </div>
           )}
           <div className="fotos-botones">
-            <button type="button" className="boton boton-sutil" onClick={() => camara.current?.click()} disabled={procesando}>
+            <button type="button" className="boton boton-sutil" onClick={() => setCamaraAbierta(true)} disabled={procesando}>
               <Icono nombre="camara" />
               Tomar foto
             </button>
@@ -399,6 +401,20 @@ export function ObservacionForm({
         </div>
         {error && <p className="error-texto" role="alert">{error}</p>}
       </form>
+      {/* Fuera del <form>: ningún botón de la cámara debe enviar la observación. */}
+      {camaraAbierta && (
+        <Camara
+          alCerrar={() => setCamaraAbierta(false)}
+          alCapturar={async (archivo) => {
+            const foto = await prepararFoto(archivo);
+            setFotos((f) => [...f, foto]);
+          }}
+          alUsarSistema={() => {
+            setCamaraAbierta(false);
+            camara.current?.click(); // cámara del sistema, como alternativa
+          }}
+        />
+      )}
     </Hoja>
   );
 }

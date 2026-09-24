@@ -46,6 +46,7 @@ VITE_MODO=demo npm run build && npx vite preview --port 4180   # y en otra termi
 node e2e/recorrido-supabase.mjs              # recorrido contra Supabase real (crea datos de prueba)
 node e2e/informe-largo.mjs <carpeta> <foto>  # informes PDF de varias hojas para revisar formato
 node e2e/tiempo-real.mjs                     # dos personas en el mismo recinto contra Supabase real (crea datos de prueba)
+node e2e/camara.mjs                          # cámara dentro de la app con cámara simulada (permiso concedido y denegado)
 ```
 
 En el modo demostración se entra eligiendo un rol: Calidad (Administrador), Revisor Terreno 1 o 2, o Inspección Técnica. Los datos quedan solo en ese navegador. El botón «Reiniciar datos de demostración» los borra.

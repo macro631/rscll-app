@@ -585,3 +585,26 @@ button.fila-recinto:hover { background: var(--realce); }
 .ya-registradas li { font-size: 0.9375rem; line-height: 1.3; }
 .obs-recien > .obs { box-shadow: 0 0 0 2px var(--estado-en_revision); animation: recien 2.4s ease-out; }
 @keyframes recien { from { background: #e1ecf8; } to { background: var(--papel); } }
+
+/* ───── cámara dentro de la app ───── */
+.camara { position: fixed; inset: 0; z-index: 90; background: #0c1418; color: #fff; display: flex; flex-direction: column; }
+.camara-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #0c1418; }
+.camara-video.espejo { transform: scaleX(-1); }
+.camara-destello { position: absolute; inset: 0; background: #fff; opacity: 0.7; pointer-events: none; }
+.camara-sup, .camara-inf { position: relative; z-index: 2; display: flex; align-items: center; }
+.camara-sup { justify-content: space-between; gap: 0.5rem; padding: calc(0.6rem + env(safe-area-inset-top, 0px)) 12px 0.6rem; background: linear-gradient(rgb(12 20 24 / 0.7), transparent); }
+.camara-inf { margin-top: auto; justify-content: space-between; padding: 1rem 24px calc(1.25rem + env(safe-area-inset-bottom, 0px)); background: linear-gradient(transparent, rgb(12 20 24 / 0.8)); }
+.camara-boton { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; border: none; background: rgb(255 255 255 / 0.16); color: #fff; }
+.camara-boton:disabled { opacity: 0.35; }
+.camara-texto { min-width: 72px; min-height: 48px; background: none; border: none; color: #fff; font-weight: 650; font-stretch: 92%; font-size: 1.0625rem; text-align: left; }
+.camara-contador { background: rgb(255 255 255 / 0.92); color: var(--tinta); font-weight: 650; font-stretch: 90%; font-size: 0.875rem; padding: 0.3rem 0.7rem; border-radius: 999px; }
+.camara-disparador { width: 76px; height: 76px; border-radius: 50%; border: 4px solid #fff; background: none; padding: 5px; display: grid; }
+.camara-disparador span { border-radius: 50%; background: #fff; transition: transform 0.1s; }
+.camara-disparador:active span { transform: scale(0.9); }
+.camara-disparador:disabled { opacity: 0.35; }
+.camara-mensaje { position: relative; z-index: 2; margin: auto 20px; background: var(--papel); color: var(--tinta); border-radius: var(--radio); padding: 1.1rem 1rem; display: grid; gap: 0.5rem; justify-items: start; max-width: 460px; align-self: center; }
+.camara-mensaje .icono { color: var(--tinta-2); }
+.camara-mensaje p { margin: 0; }
+.camara-pasos { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; font-size: 0.9375rem; }
+.camara-alternativas { display: grid; gap: 0.5rem; width: 100%; margin-top: 0.4rem; }
+.camara-sutil { border-color: var(--linea); }
