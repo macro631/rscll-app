@@ -24,12 +24,12 @@ prototipo/
     src/test/sql.test.ts    Criterios de aceptación sobre la base real (PGlite)
     e2e/recorrido.mjs       Recorrido completo en Edge/Chrome
   supabase/
-    migrations/             001 esquema · 002 estado · 003 RLS · 004 acciones · 005 consultas · 006 storage/realtime · 007 Inspección revisa
+    migrations/             001 esquema · 002 estado · 003 RLS · 004 acciones · 005 consultas · 006 storage/realtime · 007 Inspección revisa · 008 endurecimiento
     seed.sql                Catálogo de 100 unidades (generado)
     instalar.sql            Todo lo anterior en un solo archivo (generado)
     functions/admin-usuarios/  Alta de cuentas y cambio de clave (Edge Function)
   data/catalog.json         Copia del catálogo validado
-  scripts/                  generar_seed.mjs · unir_sql.mjs · generar_iconos.mjs
+  scripts/                  generar_seed.mjs · unir_sql.mjs · generar_iconos.mjs · respaldo.mjs
 ```
 
 ## Probar en este equipo
@@ -100,7 +100,8 @@ VITE_MODO=demo npm run build
 
 ## Respaldo y continuidad (§13)
 
-- **Datos:** en **Historial → Respaldo** se descarga un JSON completo con recintos, fichas, observaciones, comentarios, recepciones e historial.
+- **Respaldo completo en este computador:** `node scripts/respaldo.mjs` (desde `prototipo/`) descarga todas las tablas y todas las fotos a `respaldos/AAAAMMDD_HHMM/`. Usa la clave secreta de `.env.supabase.local`; la carpeta `respaldos/` no se sube a GitHub. Ejecútelo al menos una vez por semana mientras el proyecto esté en el plan gratuito.
+- **Datos desde la app:** en **Historial → Respaldo** se descarga un JSON completo con recintos, fichas, observaciones, comentarios, recepciones e historial.
 - **Fotos:** están en los buckets `fotos-original` y `fotos-ligera`. Se pueden descargar con la CLI de Supabase o desde *Storage*.
 - **Respaldos automáticos:** revise qué incluye su plan de Supabase. Los respaldos diarios y la recuperación a un punto en el tiempo dependen del plan, y los proyectos gratuitos pueden pausarse tras días sin uso. Para la obra se recomienda un plan pagado o, como mínimo, un respaldo manual semanal.
 

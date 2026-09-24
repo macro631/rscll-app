@@ -10,3 +10,4 @@ supabase/.branches/
 *.log
 .DS_Store
 !app/.env.production
+respaldos/

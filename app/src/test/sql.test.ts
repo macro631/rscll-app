@@ -322,6 +322,11 @@ describe('RLS', () => {
       await expect(
         db.query(`update observacion set estado = 'subsanada'`),
       ).rejects.toThrow(/permission denied/);
+      await expect(db.query(`truncate evento`)).rejects.toThrow(/permission denied/);
+      const vista = await db.query<{ escribe: boolean }>(
+        `select has_table_privilege('authenticated', 'observacion_detalle', 'insert,update,delete,truncate') as escribe`,
+      );
+      expect(vista.rows[0].escribe).toBe(false);
       const ev = await db.query<{ n: number }>(`select count(*)::int as n from evento`);
       expect(ev.rows[0].n).toBe(0); // Historial solo para Administrador
       await db.query(`select set_config('request.jwt.claim.sub', '', false)`);
