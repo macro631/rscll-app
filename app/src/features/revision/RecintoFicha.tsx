@@ -180,6 +180,7 @@ export function RecintoFicha() {
           codigo={recinto.codigo}
           textoGuardar="Registrar y devolver"
           permitirOtra={false}
+          existentes={observaciones}
           alCerrar={() => setDefecto(false)}
           alGuardar={async (d) => {
             await encolar({ tipo: 'inspeccion', recintoId: recinto.id, especialidad: d.especialidad, descripcion: d.descripcion, fotos: d.fotos });

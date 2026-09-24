@@ -240,12 +240,37 @@ export interface DatosObservacion {
 }
 
 /** Ingreso rápido: especialidad, descripción (se puede dictar con el teclado) y fotos. */
+/** Observaciones ya registradas en el recinto con la misma especialidad: evita duplicar lo que otro ya anotó. */
+function YaRegistradas({ especialidad, existentes }: { especialidad: string; existentes: Observacion[] }) {
+  const mismas = existentes.filter((o) => o.especialidad === especialidad);
+  if (!especialidad || mismas.length === 0) return null;
+  return (
+    <div className="ya-registradas" role="status">
+      <p className="ya-registradas-titulo">
+        Ya registradas en este recinto · {especialidad} ({mismas.length})
+      </p>
+      <ul>
+        {mismas.map((o) => (
+          <li key={o.id}>
+            <span className="obs-numero">N° {o.numero}</span> {o.descripcion}
+            <span className="mini tenue">
+              {' '}
+              — {o.autor}, {o.estado === 'pendiente' ? 'pendiente' : 'subsanada'}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function ObservacionForm({
   clave,
   titulo,
   codigo,
   textoGuardar = 'Guardar',
   permitirOtra = true,
+  existentes = [],
   alGuardar,
   alCerrar,
 }: {
@@ -254,6 +279,8 @@ export function ObservacionForm({
   codigo?: string;
   textoGuardar?: string;
   permitirOtra?: boolean;
+  /** Observaciones vigentes del recinto (de todas las fichas), actualizadas en tiempo real. */
+  existentes?: Observacion[];
   alGuardar: (d: DatosObservacion) => Promise<void>;
   alCerrar: () => void;
 }) {
@@ -337,6 +364,7 @@ export function ObservacionForm({
             ))}
           </select>
         </label>
+        <YaRegistradas especialidad={borrador.especialidad} existentes={existentes} />
         <label>
           Descripción
           <textarea

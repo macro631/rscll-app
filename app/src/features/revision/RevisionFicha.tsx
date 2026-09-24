@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSesion } from '../../auth';
 import { useAviso } from '../../components/Aviso';
@@ -6,7 +6,7 @@ import { Cajetin } from '../../components/Cajetin';
 import { Icono } from '../../components/Icono';
 import { ObservacionEnCola, ObservacionForm, ObservacionItem } from '../../components/Observacion';
 import { descartar, encolar, useCola } from '../../lib/cola';
-import { useAccion, useCatalogo, useFichaRevision } from '../../lib/datos';
+import { useAccion, useCatalogo, useFichaRecinto, useFichaRevision } from '../../lib/datos';
 import { fecha } from '../../lib/formato';
 
 export function RevisionFicha() {
@@ -16,10 +16,42 @@ export function RevisionFicha() {
   const { perfil } = useSesion();
   const { porId } = useCatalogo();
   const ficha = useFichaRevision(id);
+  // Todo el recinto (todas las fichas): se refresca en tiempo real cuando otra persona registra algo.
+  const delRecinto = useFichaRecinto(ficha.data?.revision.recinto_id);
   const accion = useAccion();
   const cola = useCola().filter((i) => i.revisionId === id);
   const [formulario, setFormulario] = useState(false);
+  const [nuevas, setNuevas] = useState<Set<string>>(new Set());
+  const vistas = useRef<Set<string> | null>(null);
   const editable = !!ficha.data && ficha.data.revision.autor_id === perfil?.id && ficha.data.revision.condicion === 'abierta';
+
+  const otras = useMemo(
+    () => (delRecinto.data?.observaciones ?? []).filter((o) => o.revision_id !== id),
+    [delRecinto.data, id],
+  );
+  const revisandoAhora = (delRecinto.data?.revisiones ?? []).filter(
+    (r) => r.condicion === 'abierta' && r.autor_id !== perfil?.id,
+  );
+
+  // Aviso y resaltado cuando otra persona agrega una observación mientras se trabaja la ficha.
+  useEffect(() => {
+    if (!delRecinto.data) return;
+    const ids = otras.map((o) => o.id);
+    if (vistas.current === null) {
+      vistas.current = new Set(ids);
+      return;
+    }
+    const recien = otras.filter((o) => !vistas.current!.has(o.id));
+    if (recien.length === 0) return;
+    recien.forEach((o) => vistas.current!.add(o.id));
+    setNuevas((n) => new Set([...n, ...recien.map((o) => o.id)]));
+    const o = recien[recien.length - 1];
+    aviso(
+      recien.length === 1
+        ? `${o.autor} registró N° ${o.numero}: ${o.especialidad}`
+        : `${recien.length} observaciones nuevas de otras personas en este recinto`,
+    );
+  }, [otras, delRecinto.data, aviso]);
 
   // Abre el formulario la primera vez si la ficha propia está vacía: el siguiente paso es registrar.
   useEffect(() => {
@@ -40,6 +72,7 @@ export function RevisionFicha() {
   const { revision, observaciones, estado } = ficha.data;
   const recinto = porId.get(revision.recinto_id);
   const total = observaciones.length + cola.length;
+  const existentes = [...observaciones, ...otras];
 
   function finalizar() {
     accion.mutate(
@@ -74,9 +107,18 @@ export function RevisionFicha() {
         </span>
       </Cajetin>
       {revision.condicion === 'anulada' && <p className="nota nota-aviso">Anulada: {revision.motivo_anulacion}</p>}
+      {revisandoAhora.length > 0 && (
+        <p className="nota nota-conjunto">
+          <Icono nombre="usuarios" tam={18} />
+          <span>
+            También revisando ahora: <strong>{revisandoAhora.map((r) => r.autor).join(', ')}</strong>. Sus observaciones aparecen
+            aquí al instante.
+          </span>
+        </p>
+      )}
 
       <div className="seccion-titulo">
-        <h2>Observaciones de esta ficha</h2>
+        <h2>{editable ? 'Mis observaciones' : 'Observaciones de esta ficha'}</h2>
         <span className="suave chico">{total}</span>
       </div>
       {total === 0 && (
@@ -94,6 +136,24 @@ export function RevisionFicha() {
           <ObservacionItem key={o.id} obs={o} acciones={{ editar: editable, comprobar: true, devolver: true }} />
         ))}
       </div>
+
+      {otras.length > 0 && (
+        <section aria-live="polite">
+          <div className="seccion-titulo">
+            <h2>De otras personas en este recinto</h2>
+            <span className="suave chico">{otras.length}</span>
+          </div>
+          <div className="lista-obs">
+            {[...otras]
+              .sort((a, b) => b.numero - a.numero)
+              .map((o) => (
+                <div key={o.id} className={nuevas.has(o.id) ? 'obs-recien' : undefined}>
+                  <ObservacionItem obs={o} acciones={{ comprobar: true, devolver: true }} />
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
 
       {editable && (
         <>
@@ -115,6 +175,7 @@ export function RevisionFicha() {
           clave={`revision:${revision.id}`}
           titulo="Nueva observación"
           codigo={recinto?.codigo}
+          existentes={existentes}
           alCerrar={() => setFormulario(false)}
           alGuardar={async (d) => {
             await encolar({

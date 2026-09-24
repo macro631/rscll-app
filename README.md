@@ -45,6 +45,7 @@ npm run build && npx vite preview --port 4173
 VITE_MODO=demo npm run build && npx vite preview --port 4180   # y en otra terminal: npm run e2e
 node e2e/recorrido-supabase.mjs              # recorrido contra Supabase real (crea datos de prueba)
 node e2e/informe-largo.mjs <carpeta> <foto>  # informes PDF de varias hojas para revisar formato
+node e2e/tiempo-real.mjs                     # dos personas en el mismo recinto contra Supabase real (crea datos de prueba)
 ```
 
 En el modo demostración se entra eligiendo un rol: Calidad (Administrador), Revisor Terreno 1 o 2, o Inspección Técnica. Los datos quedan solo en ese navegador. El botón «Reiniciar datos de demostración» los borra.
@@ -112,6 +113,7 @@ VITE_MODO=demo npm run build
   5. Resto: verde claro.
 - **Escaleras:** E1 y E2 son una sola unidad con figura en ambos pisos. El total global las cuenta una vez.
 - **Inspección también revisa** (decisión del 24-09-2026, reemplaza la restricción de §3): además de recepcionar, devolver y registrar defectos nuevos, abre sus propias fichas de revisión y registra observaciones como un Revisor. Migración `007_inspeccion_revisa.sql`.
+- **Trabajo en conjunto:** todos los roles registran observaciones; varias personas pueden revisar el mismo recinto a la vez, cada una en su ficha. En la ficha se ven al instante las observaciones de los demás y quién más está revisando, y el formulario muestra las observaciones ya registradas con la misma especialidad para evitar duplicados.
 - **Recepción:** solo Inspección recepciona. Cualquier pendiente posterior deja la recepción sin vigencia, y el Historial la conserva.
 - **Defecto sin observación previa** (§16.1, resuelto): Inspección registra una *Observación de Inspección* con especialidad en un recinto verde claro o recepcionado.
 - **Administrador:** reabre, anula y revierte anulaciones, y todo queda en el Historial.

@@ -575,3 +575,13 @@ button.fila-recinto:hover { background: var(--realce); }
 .grupo-sector .icono { transition: transform 0.15s; }
 /* La miniatura oscurece lo que queda fuera de la vista con una sombra enorme: se recorta a su caja. */
 .planta-mini .rzpp-mini-map { overflow: hidden; }
+
+/* ───── trabajo en conjunto ───── */
+.nota-conjunto { display: flex; gap: 0.5rem; align-items: flex-start; border-left-color: var(--estado-en_revision); }
+.nota-conjunto .icono { margin-top: 0.15rem; color: var(--texto-en_revision); }
+.ya-registradas { border: 1px solid var(--estado-pendiente); border-left-width: 4px; border-radius: var(--radio); background: #fdf6e7; padding: 0.55rem 0.7rem; }
+.ya-registradas-titulo { margin: 0 0 0.3rem; font-weight: 650; font-stretch: 90%; font-size: 0.875rem; color: var(--texto-pendiente); }
+.ya-registradas ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; max-height: 9.5rem; overflow-y: auto; }
+.ya-registradas li { font-size: 0.9375rem; line-height: 1.3; }
+.obs-recien > .obs { box-shadow: 0 0 0 2px var(--estado-en_revision); animation: recien 2.4s ease-out; }
+@keyframes recien { from { background: #e1ecf8; } to { background: var(--papel); } }
