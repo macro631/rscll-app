@@ -1,4 +1,14 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent,
+  type ReactNode,
+} from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MiniMap, TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { EstadoBadge } from './Estado';
@@ -17,6 +27,9 @@ const DEFS = `
     <circle cx="5" cy="5" r="1.4" style="fill: var(--estado-recepcionado-trama)"/>
   </pattern>
 </defs>`;
+
+/** Margen de la planta encuadrada: deja libres los controles (arriba) y la ayuda (abajo). Igual que en index.css. */
+const MARGEN_ENCUADRE = { lado: 12, alto: 58 };
 
 /** Una planta es «larga» si es más del doble de alta que ancha: se muestra girada, en horizontal. */
 const PROPORCION_LARGA = 1.5;
@@ -84,9 +97,11 @@ interface Props {
   /** Acción adicional en la tarjeta del recinto tocado (p. ej. Recepcionar para Inspección). */
   accionExtra?: (r: Recinto, estado: EstadoFila | undefined) => ReactNode;
   claseMarco?: string;
+  /** Abrir con la planta completa y el marco ajustado a su forma (Inicio). */
+  encuadrar?: boolean;
 }
 
-export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir, accionExtra, claseMarco }: Props) {
+export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir, accionExtra, claseMarco, encuadrar = false }: Props) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['svg', sector.archivo],
     queryFn: async () => {
@@ -114,26 +129,28 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir,
     const medir = () => {
       const w = marco.current!.clientWidth;
       const h = marco.current!.clientHeight;
-      const k = Math.min(w, h / data.proporcion);
+      const m = encuadrar ? MARGEN_ENCUADRE : { lado: 0, alto: 0 };
+      const k = Math.min(w - 2 * m.lado, (h - 2 * m.alto) / data.proporcion);
       setTam({ w, h, ancho: k, alto: k * data.proporcion });
     };
     medir();
     const ro = new ResizeObserver(medir);
     ro.observe(marco.current);
     return () => ro.disconnect();
-  }, [data]);
+  }, [data, encuadrar]);
 
-  // Zoom de entrada: una planta apaisada llena el alto del visor (se recorre de lado con la miniatura como guía).
+  // Zoom de entrada: encuadrada, la planta completa; si no, una planta apaisada llena el alto del visor
+  // (se recorre de lado con la miniatura como guía).
   const ajuste = useMemo(() => {
     if (!tam) return null;
     const llenarAlto = tam.h / tam.alto;
-    const inicial = Math.max(1, Math.min(llenarAlto, escritorio ? 2.4 : 8));
+    const inicial = encuadrar ? 1 : Math.max(1, Math.min(llenarAlto, escritorio ? 2.4 : 8));
     const centro = (k: number) => ({
       x: tam.ancho * k < tam.w ? (tam.w - tam.ancho * k) / 2 : 0,
       y: tam.alto * k < tam.h ? (tam.h - tam.alto * k) / 2 : 0,
     });
     return { inicial, centro, max: Math.max(8, inicial * 4) };
-  }, [tam, escritorio]);
+  }, [tam, escritorio, encuadrar]);
 
   // Si la planta abre ampliada, la miniatura se muestra desde el inicio.
   useEffect(() => {
@@ -164,7 +181,7 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir,
     setElegido(resaltado);
     const el = contenido.current?.querySelector(`path[data-room-id="${CSS.escape(resaltado)}"]`);
     if (el) {
-      const t = setTimeout(() => zoom.current?.zoomToElement(el as unknown as HTMLElement, { maxScale: ajuste ? ajuste.inicial * 2 : 4 }), 60);
+      const t = setTimeout(() => zoom.current?.zoomToElement(el as unknown as HTMLElement, { maxScale: Math.max(4, (ajuste?.inicial ?? 1) * 2) }), 60);
       return () => clearTimeout(t);
     }
   }, [resaltado, data, tam, ajuste]);
@@ -206,8 +223,12 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir,
   const inicio = ajuste?.centro(ajuste.inicial);
 
   return (
-    <div className="planta">
-      <div className={`planta-marco ${claseMarco ?? ''}`} ref={marco}>
+    <div className={`planta${encuadrar ? ' planta-encuadrada' : ''}`}>
+      <div
+        className={`planta-marco ${claseMarco ?? ''}`}
+        style={encuadrar && data ? ({ '--proporcion': data.proporcion } as CSSProperties) : undefined}
+        ref={marco}
+      >
         {isLoading && <p className="planta-mensaje">Cargando planta…</p>}
         {error && <p className="planta-mensaje error-texto">No se pudo cargar la planta. La lista de recintos sigue disponible.</p>}
         {data && tam && ajuste && inicio && (
@@ -281,7 +302,7 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir,
             )}
           </div>
         ) : (
-          data && <span className="planta-ayuda">{data.girada ? 'Deslice de lado para recorrer la planta · ' : ''}Toque un recinto para ver su estado</span>
+          data && <span className="planta-ayuda">{data.girada && !encuadrar ? 'Deslice de lado para recorrer la planta · ' : ''}Toque un recinto para ver su estado</span>
         )}
       </div>
     </div>

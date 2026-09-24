@@ -623,3 +623,36 @@ button.fila-recinto:hover { background: var(--realce); }
 /* Botones de color: el hover general (fondo claro) no debe dejarlos con texto blanco sobre blanco. */
 .boton-recepcion:hover { background: #22632a; border-color: #22632a; }
 .boton-peligro.lleno:hover { background: #8f1e18; border-color: #8f1e18; }
+
+/* ───── Inicio: planta encuadrada e indicadores ───── */
+/* El marco toma la proporción de la planta (--proporcion en línea, ancho del contenedor en cqw): la planta completa,
+   sin franjas vacías. Márgenes de 12 px a los lados y 58 px arriba y abajo (MARGEN_ENCUADRE en PlantaViewer). */
+.planta-encuadrada { container-type: inline-size; }
+.planta-encuadrada .planta-marco {
+  min-height: 0;
+  height: clamp(200px, calc((100cqw - 24px) * var(--proporcion, 0.6) + 116px),
+    calc(100dvh - var(--barra-sup) - var(--barra-inf) - 264px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
+}
+@media (min-width: 1024px) {
+  .planta-encuadrada .planta-marco { height: clamp(320px, calc((100cqw - 24px) * var(--proporcion, 0.6) + 116px), calc(100dvh - 150px)); }
+}
+.planta-encuadrada .planta-controles { flex-direction: row; }
+.planta-encuadrada .planta-controles button + button { border-top: none; border-left: 1px solid var(--linea); }
+.indicadores-telefono { display: grid; gap: 0.4rem; }
+.indicadores-telefono .segmentado button { min-height: 36px; font-size: 0.875rem; }
+
+.resumen li { grid-template-columns: 1rem 1fr auto 2.6rem; transition: background-color 0.12s; }
+.resumen li.activo { background: var(--realce); }
+.resumen-pct { text-align: right; font-size: 0.8125rem; color: var(--tinta-2); font-variant-numeric: tabular-nums; }
+
+/* Anillo de estados: 2 px de papel entre segmentos; al señalar uno, los demás se atenúan. */
+.torta { position: relative; width: min(200px, 72%); margin: 1rem auto 0.4rem; }
+.torta svg { display: block; width: 100%; height: auto; }
+.torta-segmento { stroke: var(--papel); stroke-width: 2; stroke-linejoin: round; transition: opacity 0.15s; outline: none; }
+.torta-segmento.atenuado { opacity: 0.28; }
+.torta-segmento:focus-visible { stroke: var(--correccion); stroke-width: 3; }
+.torta-vacia { fill: none; stroke: var(--linea-suave); }
+.torta-centro { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; text-align: center; line-height: 1.15; }
+.torta-centro strong { font-size: 2.25rem; font-weight: 750; font-stretch: 75%; font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 0.15rem; }
+.torta-centro span { font-size: 0.8125rem; color: var(--tinta-2); font-stretch: 88%; max-width: 110px; }
+.torta-centro .tenue { color: var(--tinta-3); }

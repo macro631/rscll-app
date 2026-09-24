@@ -26,10 +26,10 @@ async function recorrer(nombre, viewport, usuario) {
   await p.getByRole('button', { name: 'Acercar' }).click();
   await p.waitForTimeout(400);
   await foto('01b_inicio_zoom');
-  await p.getByRole('tab', { name: 'Casa' }).click();
+  await p.getByRole('tab', { name: 'Casa', exact: true }).click();
   await p.locator('path[data-room-id]').first().waitFor();
   await foto('01c_casa');
-  await p.getByRole('tab', { name: 'Exteriores' }).click();
+  await p.getByRole('tab', { name: 'Exteriores', exact: true }).click();
   await foto('02_exteriores');
   await p.getByRole('link', { name: /Revisión/ }).click();
   await p.locator('.grupo-sector-cabeza').first().waitFor();
@@ -38,7 +38,7 @@ async function recorrer(nombre, viewport, usuario) {
   await p.locator('.fila-recinto').first().waitFor();
   await foto('03b_revision_piso1');
   await p.getByRole('tab', { name: 'Planta', exact: true }).click();
-  await p.getByRole('tab', { name: 'Piso 1' }).click();
+  await p.getByRole('tab', { name: 'Piso 1', exact: true }).click();
   await p.locator('path[data-room-id]').first().waitFor();
   await foto('04_revision_planta');
   await p.goto(`${URL}/revision/recinto/A-02`);

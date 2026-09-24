@@ -101,7 +101,7 @@ Todos los comandos van desde `prototipo/app/`.
 | --- | --- | --- |
 | `npm test` | 23 pruebas: reglas de estado, permisos por rol, seguridad de la base, informes. | Base temporal en memoria. |
 | `npm run lint` | Calidad del código. | — |
-| `npm run build:demo` y `npm run preview`, y en otra terminal `npm run e2e` | Recorrido completo de 21 pasos en Edge: plantas, revisión con foto, subsanación, recepción (también desde la lista), PDF, Excel e Historial. | Modo demostración. |
+| `npm run build:demo` y `npm run preview`, y en otra terminal `npm run e2e` | Recorrido completo de 22 pasos en Edge: plantas (Inicio encuadrado), revisión con foto, subsanación, recepción (también desde la lista), PDF, Excel e Historial. | Modo demostración. |
 | `npm run e2e:camara` | Cámara dentro de la app, con permiso concedido y denegado. | Modo demostración. |
 | `npm run e2e:informe -- <carpeta> <foto>` | Informes PDF de varias hojas. | Modo demostración. |
 | `npm run e2e:capturas -- <carpeta>` | Capturas de todas las pantallas, en teléfono y escritorio. | Modo demostración. |

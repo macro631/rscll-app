@@ -57,7 +57,7 @@ try {
   ok('la Edge Function crea cuentas con su rol');
   await admin.screenshot({ path: join(capturas, '01_usuarios.png') });
   await admin.getByRole('link', { name: /Inicio/ }).click();
-  await admin.getByRole('tab', { name: 'Piso 1' }).click();
+  await admin.getByRole('tab', { name: 'Piso 1', exact: true }).click();
   await admin.locator(`path[data-room-id="RSCLL:${RECINTO}"]`).waitFor();
 
   // Revisor en teléfono

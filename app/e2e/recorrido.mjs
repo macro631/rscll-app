@@ -60,11 +60,21 @@ try {
   await entrarComo(tel, 'Revisor Terreno 1');
   await tel.locator('.planta-contenido[class*=modo-] path[data-room-id]').first().waitFor();
   esperar((await tel.locator('.planta-contenido[class*=modo-] path[data-room-id]').count()) === 44, 'Piso 1 muestra 44 figuras');
+  {
+    await tel.waitForTimeout(300);
+    const marco = await tel.locator('.planta-marco').boundingBox();
+    const planta = await tel.locator('.planta-contenido.modo-consulta').boundingBox();
+    const controles = await tel.locator('.planta-controles').boundingBox();
+    const dentro = planta.x >= marco.x && planta.x + planta.width <= marco.x + marco.width + 1 && planta.y >= marco.y && planta.y + planta.height <= marco.y + marco.height + 1;
+    const libre = controles.y + controles.height <= planta.y;
+    const alcance = await tel.getByRole('tablist', { name: 'Alcance de los indicadores' }).getByRole('tab', { selected: true }).innerText();
+    esperar(dentro && libre && alcance === 'Total de la obra', 'Inicio abre con la planta completa, sin controles encima, e indicadores de toda la obra');
+  }
   esperar((await estadoFigura(tel, 'RSCLL:E1', 'estado-pendiente')).includes('estado-pendiente'), 'E1 en ámbar en Piso 1');
   esperar((await estadoFigura(tel, 'RSCLL:A-04', 'estado-recepcionado')).includes('estado-recepcionado'), 'A-04 recepcionado (verde oscuro)');
   await tel.screenshot({ path: join(capturas, '02_inicio_piso1.png') });
 
-  await tel.getByRole('tab', { name: 'Piso 2' }).click();
+  await tel.getByRole('tab', { name: 'Piso 2', exact: true }).click();
   await tel.locator('.planta-contenido[class*=modo-] path[data-room-id="RSCLL:E1"]').waitFor();
   esperar((await estadoFigura(tel, 'RSCLL:E1', 'estado-pendiente')).includes('estado-pendiente'), 'E1 con el mismo estado en Piso 2');
   await tel.locator('.planta-contenido[class*=modo-] path[data-room-id="RSCLL:E2"]').dispatchEvent('pointerdown', { clientX: 0, clientY: 0 });
@@ -72,7 +82,7 @@ try {
   await tel.locator('.planta-ficha').getByText('Escalera 02').waitFor();
   ok('tocar una figura muestra código, nombre y estado sin abrir la ficha');
 
-  await tel.getByRole('tab', { name: 'Exteriores' }).click();
+  await tel.getByRole('tab', { name: 'Exteriores', exact: true }).click();
   esperar((await tel.locator('.exteriores .fila-recinto').count()) === 9, 'Exteriores lista 9 unidades');
   await tel.screenshot({ path: join(capturas, '03_inicio_exteriores.png') });
 
@@ -102,7 +112,7 @@ try {
   await tel.getByRole('button', { name: 'Finalizar revisión' }).click();
   await tel.waitForURL(/\/inicio/);
   ok('finalizar vuelve a Inicio');
-  await tel.getByRole('tab', { name: 'Piso 1' }).click();
+  await tel.getByRole('tab', { name: 'Piso 1', exact: true }).click();
   await tel.locator('.planta-contenido[class*=modo-] path[data-room-id="RSCLL:A-20"]').waitFor();
   esperar((await estadoFigura(tel, 'RSCLL:A-20', 'estado-pendiente')).includes('estado-pendiente'), 'A-20 queda ámbar');
 
@@ -159,7 +169,7 @@ try {
   await tel.locator('article.obs:not(.obs-en-cola)').filter({ hasText: 'Rejilla de retorno' }).waitFor();
   await tel.getByRole('button', { name: 'Finalizar revisión' }).click();
   await tel.waitForURL(/\/inicio/);
-  await tel.getByRole('tab', { name: 'Piso 1' }).click();
+  await tel.getByRole('tab', { name: 'Piso 1', exact: true }).click();
   esperar((await estadoFigura(tel, 'RSCLL:A-21', 'estado-pendiente')).includes('estado-pendiente'), 'Inspección también revisa: registra una observación y A-21 queda ámbar');
 
   // Informes PDF desde el teléfono

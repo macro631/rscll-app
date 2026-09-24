@@ -84,12 +84,24 @@ export function Inicio() {
   const { mapa } = useEstados();
   const escritorio = useEsEscritorio();
   const [sector, setSector] = useSectorRecordado();
-  const [alcance, setAlcance] = useState<'sector' | 'global'>('sector');
+  const [alcance, setAlcance] = useState<'sector' | 'global'>('global');
   const [resaltado, setResaltado] = useState<string | null>(null);
   const sectorActual = SECTORES.find((s) => s.id === sector) ?? SECTORES[0];
 
   if (isLoading) return <p className="cargando">Cargando catálogo…</p>;
   if (error) return <p className="error-texto">No se pudo cargar el catálogo: {String(error.message)}</p>;
+
+  const sectorIndicadores = alcance === 'sector' ? sector : null;
+  const selectorAlcance = (
+    <div className="segmentado" role="tablist" aria-label="Alcance de los indicadores">
+      <button role="tab" aria-selected={alcance === 'global'} onClick={() => setAlcance('global')}>
+        Total de la obra
+      </button>
+      <button role="tab" aria-selected={alcance === 'sector'} onClick={() => setAlcance('sector')}>
+        Solo {sectorActual.corto}
+      </button>
+    </div>
+  );
 
   function elegir(r: Recinto) {
     setSector(sectorPara(r, sector));
@@ -108,12 +120,25 @@ export function Inicio() {
           }}
         />
         <RecintoBuscador recintos={recintos} estados={mapa} onElegir={elegir} placeholder="Buscar recinto por código o nombre" />
-        {!escritorio && <FranjaEstados recintos={recintos} estados={mapa} sector={sector} />}
+        {!escritorio && (
+          <div className="indicadores-telefono">
+            {selectorAlcance}
+            <FranjaEstados recintos={recintos} estados={mapa} sector={sectorIndicadores} />
+          </div>
+        )}
       </div>
 
       <div>
         {sectorActual.archivo ? (
-          <PlantaViewer key={sectorActual.id} sector={sectorActual} estados={mapa} porId={porId} resaltado={resaltado} modo="consulta" />
+          <PlantaViewer
+            key={sectorActual.id}
+            sector={sectorActual}
+            estados={mapa}
+            porId={porId}
+            resaltado={resaltado}
+            modo="consulta"
+            encuadrar
+          />
         ) : (
           <ListaExteriores recintos={recintos} estados={mapa} resaltado={resaltado} />
         )}
@@ -121,18 +146,11 @@ export function Inicio() {
 
       {escritorio && (
         <aside className="inicio-lateral">
-          <div className="segmentado" role="tablist" aria-label="Alcance de los indicadores">
-            <button role="tab" aria-selected={alcance === 'sector'} onClick={() => setAlcance('sector')}>
-              {sectorActual.corto}
-            </button>
-            <button role="tab" aria-selected={alcance === 'global'} onClick={() => setAlcance('global')}>
-              Total de la obra
-            </button>
-          </div>
+          {selectorAlcance}
           <ResumenEstados
             recintos={recintos}
             estados={mapa}
-            sector={alcance === 'sector' ? sector : null}
+            sector={sectorIndicadores}
             titulo={alcance === 'sector' ? sectorActual.corto : 'Total de la obra'}
           />
         </aside>
