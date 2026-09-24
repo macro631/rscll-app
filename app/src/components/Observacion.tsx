@@ -326,22 +326,17 @@ export function ObservacionForm({
             {guardadas === 1 ? '1 observación guardada' : `${guardadas} observaciones guardadas`} en esta ficha.
           </p>
         )}
-        <fieldset>
-          <legend>Especialidad</legend>
-          <div className="especialidades">
+        <label>
+          Especialidad
+          <select value={borrador.especialidad} onChange={(e) => cambiar({ especialidad: e.target.value })}>
+            <option value="" disabled>
+              Elija la especialidad
+            </option>
             {ESPECIALIDADES.map((s) => (
-              <button
-                type="button"
-                key={s}
-                className="opcion"
-                aria-pressed={borrador.especialidad === s}
-                onClick={() => cambiar({ especialidad: s })}
-              >
-                {s}
-              </button>
+              <option key={s}>{s}</option>
             ))}
-          </div>
-        </fieldset>
+          </select>
+        </label>
         <label>
           Descripción
           <textarea

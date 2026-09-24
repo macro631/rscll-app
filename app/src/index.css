@@ -552,3 +552,26 @@ button.fila-recinto:hover { background: var(--realce); }
 .tabla-base td:nth-child(2) { min-width: 210px; }
 .tabla-base td:nth-child(8) { white-space: nowrap; }
 .cajetin-datos > div { flex: 1 1 auto; }
+
+/* ───── plantas giradas y miniatura ───── */
+.planta-mini { position: absolute; left: 10px; top: 10px; z-index: 5; background: var(--papel); border: 1px solid var(--tinta); border-radius: 4px; padding: 3px; box-shadow: 0 6px 16px rgb(21 35 43 / 0.18); pointer-events: auto; }
+.planta-mini .planta-svg .figura { stroke-width: 2; cursor: default; }
+.planta-mini .rzpp-minimap-preview { border-width: 2px !important; background: rgb(200 16 46 / 0.08); }
+
+/* ───── grupos por sector (Revisión) ───── */
+.grupos-sector { display: grid; gap: 0.5rem; }
+.grupo-sector { background: var(--papel); border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+.grupo-sector.abierto { border-color: var(--tinta); }
+.grupo-sector-cabeza {
+  width: 100%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.75rem;
+  min-height: 60px; padding: 0.5rem 0.9rem; background: none; border: none; text-align: left; color: var(--tinta);
+}
+.grupo-sector-cabeza:hover:not(:disabled) { background: var(--realce); }
+.grupo-sector-cabeza:disabled { color: var(--tinta-3); cursor: default; }
+.grupo-sector-nombre { font-stretch: 72%; font-weight: 800; font-size: 1.375rem; min-width: 6.5rem; }
+.grupo-sector-resumen { font-weight: 550; font-stretch: 92%; }
+.grupo-sector-resumen .mini { color: var(--texto-pendiente); font-weight: 650; }
+.grupo-sector .lista-recintos { border: none; border-top: 1.5px solid var(--tinta); border-radius: 0; }
+.grupo-sector .icono { transition: transform 0.15s; }
+/* La miniatura oscurece lo que queda fuera de la vista con una sombra enorme: se recorta a su caja. */
+.planta-mini .rzpp-mini-map { overflow: hidden; }

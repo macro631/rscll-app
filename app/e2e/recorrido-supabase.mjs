@@ -5,7 +5,7 @@ import { chromium } from 'playwright-core';
 import { mkdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const URL = process.env.URL_APP ?? 'http://localhost:4173';
+const URL = process.env.URL_APP ?? 'http://localhost:4180';
 const capturas = process.argv[2] ?? 'e2e/capturas-supabase';
 mkdirSync(capturas, { recursive: true });
 const icono = join(process.cwd(), 'public', 'icono-512.png');
@@ -68,7 +68,7 @@ try {
   await admin.locator(`path[data-room-id="RSCLL:${RECINTO}"].estado-en_revision`).waitFor({ timeout: 15_000 });
   ok('tiempo real: la planta del Administrador pasa a azul sin recargar');
   if (!(await rev.locator('.hoja').count())) await rev.getByRole('button', { name: 'Observación' }).click();
-  await rev.getByRole('button', { name: 'Pintura' }).click();
+  await rev.getByLabel('Especialidad').selectOption('Pintura');
   await rev.getByPlaceholder(/Qué se observa/).fill('Prueba: muro con mancha');
   await rev.locator('input[type=file]:not([capture])').setInputFiles(icono);
   await rev.locator('.hoja .foto-mini img').waitFor();
@@ -95,9 +95,10 @@ try {
 
   // Informe con foto
   await insp.getByRole('link', { name: /Informes/ }).click();
+  await insp.locator('summary', { hasText: 'Filtros' }).click();
   await insp.locator('.filtros select').nth(1).selectOption(`RSCLL:${RECINTO}`);
-  await insp.getByText(/1 resultado/).waitFor({ timeout: 15_000 });
-  const [pdf] = await Promise.all([insp.waitForEvent('download', { timeout: 60_000 }), insp.getByRole('button', { name: 'Emitir PDF' }).click()]);
+  await insp.locator('.informe-total').filter({ hasText: /^1 observación/ }).waitFor({ timeout: 15_000 });
+  const [pdf] = await Promise.all([insp.waitForEvent('download', { timeout: 60_000 }), insp.getByRole('button', { name: /Emitir PDF/ }).click()]);
   const ruta = join(capturas, pdf.suggestedFilename());
   await pdf.saveAs(ruta);
   if (statSync(ruta).size < 20_000) throw new Error('El PDF no parece incluir la foto');

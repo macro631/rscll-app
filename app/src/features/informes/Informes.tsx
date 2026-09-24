@@ -213,14 +213,21 @@ export default function Informes() {
               <div className="tabla-envoltura">
                 <table className="tabla">
                   <thead>
-                    <tr><th>N°</th><th>Recinto</th><th>Especialidad</th><th>Observación</th><th>Estado</th><th>Fotos</th></tr>
+                    <tr>
+                      <th>N°</th>
+                      {agrupacion !== 'recinto' && <th>Recinto</th>}
+                      {agrupacion !== 'especialidad' && <th>Especialidad</th>}
+                      <th>Observación</th>
+                      <th>Estado</th>
+                      <th>Fotos</th>
+                    </tr>
                   </thead>
                   <tbody>
                     {obs.map((o) => (
                       <tr key={o.id}>
                         <td className="codigo">{o.numero}</td>
-                        <td><span className="codigo">{o.codigo}</span> {o.recinto_nombre}</td>
-                        <td>{o.especialidad}</td>
+                        {agrupacion !== 'recinto' && <td><span className="codigo">{o.codigo}</span> {o.recinto_nombre}</td>}
+                        {agrupacion !== 'especialidad' && <td>{o.especialidad}</td>}
                         <td className="celda-texto">
                           {o.descripcion}
                           {o.comentario_inspeccion && <div className="comentario-insp">Inspección: {o.comentario_inspeccion}</div>}

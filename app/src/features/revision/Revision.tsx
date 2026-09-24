@@ -31,23 +31,30 @@ export function Revision() {
     ? ['listos', 'devueltos', 'recepcionados', 'todos']
     : ['nueva', 'pendientes', 'listos', 'todos'];
   const [vista, setVista] = useState<Vista>(vistas[0]);
-  const [sectorFiltro, setSectorFiltro] = useState('');
   const [texto, setTexto] = useState('');
   const [modo, setModo] = useState<'lista' | 'planta'>('lista');
   const [sectorPlanta, setSectorPlanta] = useSectorRecordado();
+  const [abiertos, setAbiertos] = useState<Set<string>>(new Set());
 
   const abrir = (r: Recinto) => navegar(`/revision/recinto/${encodeURIComponent(r.codigo)}`);
 
   const lista = useMemo(
-    () =>
-      recintos.filter(
-        (r) =>
-          FILTROS[vista].cumple(mapa.get(r.id)) &&
-          (!sectorFiltro || r.sectores.some((s) => s.sector === sectorFiltro)) &&
-          coincide(r, texto),
-      ),
-    [recintos, mapa, vista, sectorFiltro, texto],
+    () => recintos.filter((r) => FILTROS[vista].cumple(mapa.get(r.id)) && coincide(r, texto)),
+    [recintos, mapa, vista, texto],
   );
+  // Un grupo desplegable por piso o sector; E1/E2 aparecen en ambos pisos, C-06/C-13/C-14 en Casa y Exteriores.
+  const grupos = useMemo(
+    () => SECTORES.map((s) => ({ sector: s, recintos: lista.filter((r) => r.sectores.some((x) => x.sector === s.id)) })),
+    [lista],
+  );
+  const buscando = texto.trim().length > 0;
+  const alternar = (id: string) =>
+    setAbiertos((a) => {
+      const n = new Set(a);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
   const conteo = (v: Vista) => recintos.filter((r) => FILTROS[v].cumple(mapa.get(r.id))).length;
   const sectorActual = SECTORES.find((s) => s.id === sectorPlanta) ?? SECTORES[0];
 
@@ -59,20 +66,12 @@ export function Revision() {
             <Icono nombre="buscar" tam={20} />
             <input
               type="search"
-              placeholder="Buscar"
+              placeholder="Buscar por código o nombre"
               aria-label="Buscar recinto por código o nombre"
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
             />
           </div>
-          {modo === 'lista' && (
-            <select value={sectorFiltro} onChange={(e) => setSectorFiltro(e.target.value)} aria-label="Sector">
-              <option value="">Todo</option>
-              {SECTORES.map((s) => (
-                <option key={s.id} value={s.id}>{s.corto}</option>
-              ))}
-            </select>
-          )}
           <div className="segmentado" role="tablist" aria-label="Vista" style={{ flex: 'none' }}>
             <button role="tab" aria-selected={modo === 'lista'} aria-label="Lista" title="Lista" onClick={() => setModo('lista')}>
               <Icono nombre="lista" tam={20} />
@@ -117,10 +116,35 @@ export function Revision() {
         lista.length === 0 ? (
           <p className="vacio">No hay recintos con este filtro.</p>
         ) : (
-          <div className="lista-recintos">
-            {lista.map((r) => (
-              <FilaRecinto key={r.id} recinto={r} estado={mapa.get(r.id)} onAbrir={() => abrir(r)} />
-            ))}
+          <div className="grupos-sector">
+            {grupos.map(({ sector, recintos: rs }) => {
+              const abierto = rs.length > 0 && (buscando || abiertos.has(sector.id));
+              const pendientes = rs.reduce((n, r) => n + (mapa.get(r.id)?.pendientes ?? 0), 0);
+              return (
+                <section key={sector.id} className={`grupo-sector${abierto ? ' abierto' : ''}`}>
+                  <button
+                    className="grupo-sector-cabeza"
+                    aria-expanded={abierto}
+                    disabled={rs.length === 0}
+                    onClick={() => alternar(sector.id)}
+                  >
+                    <span className="grupo-sector-nombre">{sector.corto}</span>
+                    <span className="grupo-sector-resumen">
+                      {rs.length} recinto{rs.length === 1 ? '' : 's'}
+                      {pendientes > 0 && <span className="mini"> · {pendientes} obs. pendiente{pendientes === 1 ? '' : 's'}</span>}
+                    </span>
+                    <Icono nombre="abajo" tam={20} className={abierto ? 'girar' : undefined} />
+                  </button>
+                  {abierto && (
+                    <div className="lista-recintos">
+                      {rs.map((r) => (
+                        <FilaRecinto key={r.id} recinto={r} estado={mapa.get(r.id)} onAbrir={() => abrir(r)} />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
           </div>
         )
       ) : sectorActual.archivo ? (

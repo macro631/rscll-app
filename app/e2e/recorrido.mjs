@@ -45,8 +45,8 @@ async function salir(p) {
 }
 
 async function estadoFigura(p, id, clase) {
-  if (clase) await p.locator(`path[data-room-id="${id}"].${clase}`).first().waitFor({ timeout: 10_000 }).catch(() => {});
-  return p.locator(`path[data-room-id="${id}"]`).first().getAttribute('class');
+  if (clase) await p.locator(`.planta-contenido[class*=modo-] path[data-room-id="${id}"].${clase}`).first().waitFor({ timeout: 10_000 }).catch(() => {});
+  return p.locator(`.planta-contenido[class*=modo-] path[data-room-id="${id}"]`).first().getAttribute('class');
 }
 
 try {
@@ -58,17 +58,17 @@ try {
   await tel.screenshot({ path: join(capturas, '01_ingreso.png') });
 
   await entrarComo(tel, 'Revisor Terreno 1');
-  await tel.locator('path[data-room-id]').first().waitFor();
-  esperar((await tel.locator('path[data-room-id]').count()) === 44, 'Piso 1 muestra 44 figuras');
+  await tel.locator('.planta-contenido[class*=modo-] path[data-room-id]').first().waitFor();
+  esperar((await tel.locator('.planta-contenido[class*=modo-] path[data-room-id]').count()) === 44, 'Piso 1 muestra 44 figuras');
   esperar((await estadoFigura(tel, 'RSCLL:E1', 'estado-pendiente')).includes('estado-pendiente'), 'E1 en ámbar en Piso 1');
   esperar((await estadoFigura(tel, 'RSCLL:A-04', 'estado-recepcionado')).includes('estado-recepcionado'), 'A-04 recepcionado (verde oscuro)');
   await tel.screenshot({ path: join(capturas, '02_inicio_piso1.png') });
 
   await tel.getByRole('tab', { name: 'Piso 2' }).click();
-  await tel.locator('path[data-room-id="RSCLL:E1"]').waitFor();
+  await tel.locator('.planta-contenido[class*=modo-] path[data-room-id="RSCLL:E1"]').waitFor();
   esperar((await estadoFigura(tel, 'RSCLL:E1', 'estado-pendiente')).includes('estado-pendiente'), 'E1 con el mismo estado en Piso 2');
-  await tel.locator('path[data-room-id="RSCLL:E2"]').dispatchEvent('pointerdown', { clientX: 0, clientY: 0 });
-  await tel.locator('path[data-room-id="RSCLL:E2"]').dispatchEvent('pointerup', { clientX: 0, clientY: 0 });
+  await tel.locator('.planta-contenido[class*=modo-] path[data-room-id="RSCLL:E2"]').dispatchEvent('pointerdown', { clientX: 0, clientY: 0 });
+  await tel.locator('.planta-contenido[class*=modo-] path[data-room-id="RSCLL:E2"]').dispatchEvent('pointerup', { clientX: 0, clientY: 0 });
   await tel.locator('.planta-ficha').getByText('Escalera 02').waitFor();
   ok('tocar una figura muestra código, nombre y estado sin abrir la ficha');
 
@@ -82,7 +82,7 @@ try {
   await tel.locator('.lista-recintos .fila-recinto').first().click();
   await tel.getByRole('button', { name: 'Iniciar revisión' }).click();
   // La ficha vacía abre directamente el formulario de observación.
-  await tel.getByRole('button', { name: 'Pintura' }).click();
+  await tel.getByLabel('Especialidad').selectOption('Pintura');
   await tel.getByPlaceholder(/Qué se observa/).fill('Muro con fisura sobre puerta');
   await tel.locator('input[type=file]:not([capture])').setInputFiles(icono);
   await tel.locator('.hoja .foto-mini img').waitFor();
@@ -92,7 +92,7 @@ try {
   await tel.locator('article.obs:not(.obs-en-cola)').filter({ hasText: 'Muro con fisura' }).waitFor();
   await tel.locator('article.obs .fotos img').first().waitFor();
   ok('observación con foto guardada y sincronizada');
-  await tel.getByRole('button', { name: 'Terminaciones' }).click();
+  await tel.getByLabel('Especialidad').selectOption('Terminaciones');
   await tel.getByPlaceholder(/Qué se observa/).fill('Guardapolvo suelto');
   await tel.getByRole('button', { name: 'Guardar', exact: true }).click();
   await tel.locator('.hoja').waitFor({ state: 'detached' });
@@ -103,7 +103,7 @@ try {
   await tel.waitForURL(/\/inicio/);
   ok('finalizar vuelve a Inicio');
   await tel.getByRole('tab', { name: 'Piso 1' }).click();
-  await tel.locator('path[data-room-id="RSCLL:A-20"]').waitFor();
+  await tel.locator('.planta-contenido[class*=modo-] path[data-room-id="RSCLL:A-20"]').waitFor();
   esperar((await estadoFigura(tel, 'RSCLL:A-20', 'estado-pendiente')).includes('estado-pendiente'), 'A-20 queda ámbar');
 
   // Comprobación de subsanación por otro revisor
@@ -156,7 +156,7 @@ try {
   await esc.goto(URL);
   await esc.getByText('Modo demostración').waitFor({ timeout: 60_000 });
   await entrarComo(esc, 'Calidad');
-  await esc.locator('path[data-room-id]').first().waitFor();
+  await esc.locator('.planta-contenido[class*=modo-] path[data-room-id]').first().waitFor();
   await esc.screenshot({ path: join(capturas, '08_escritorio_inicio.png') });
   await esc.getByRole('link', { name: /Base/ }).click();
   await esc.locator('.tabla-base tbody tr').first().waitFor();

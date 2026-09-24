@@ -44,6 +44,7 @@ npm test             # 22 pruebas de reglas, permisos y RLS
 npm run build && npx vite preview --port 4173
 VITE_MODO=demo npm run build && npx vite preview --port 4180   # y en otra terminal: npm run e2e
 node e2e/recorrido-supabase.mjs              # recorrido contra Supabase real (crea datos de prueba)
+node e2e/informe-largo.mjs <carpeta> <foto>  # informes PDF de varias hojas para revisar formato
 ```
 
 En el modo demostración se entra eligiendo un rol: Calidad (Administrador), Revisor Terreno 1 o 2, o Inspección Técnica. Los datos quedan solo en ese navegador. El botón «Reiniciar datos de demostración» los borra.
