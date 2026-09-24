@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MiniMap, TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { EstadoBadge } from './Estado';
@@ -81,10 +81,12 @@ interface Props {
   resaltado?: string | null;
   modo: 'consulta' | 'seleccion';
   onAbrir?: (r: Recinto) => void;
+  /** Acción adicional en la tarjeta del recinto tocado (p. ej. Recepcionar para Inspección). */
+  accionExtra?: (r: Recinto, estado: EstadoFila | undefined) => ReactNode;
   claseMarco?: string;
 }
 
-export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir, claseMarco }: Props) {
+export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir, accionExtra, claseMarco }: Props) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['svg', sector.archivo],
     queryFn: async () => {
@@ -271,6 +273,7 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir,
             </button>
             {modo === 'seleccion' && (
               <div className="acciones">
+                {accionExtra?.(recintoElegido, estadoElegido)}
                 <button className="boton boton-primario boton-ancho" onClick={() => onAbrir?.(recintoElegido)}>
                   Abrir ficha de {recintoElegido.codigo}
                 </button>

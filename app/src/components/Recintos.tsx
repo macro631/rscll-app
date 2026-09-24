@@ -83,11 +83,14 @@ export function FilaRecinto({
   estado,
   onAbrir,
   extra,
+  accion,
 }: {
   recinto: Recinto;
   estado: EstadoFila | undefined;
   onAbrir?: () => void;
   extra?: ReactNode;
+  /** Acción propia de la fila (p. ej. Recepcionar), fuera del botón que abre la ficha. */
+  accion?: ReactNode;
 }) {
   const e = estado?.estado ?? 'sin_revisar';
   const cuerpo = (
@@ -107,11 +110,18 @@ export function FilaRecinto({
       </span>
     </>
   );
-  return onAbrir ? (
+  const fila = onAbrir ? (
     <button className="fila-recinto" onClick={onAbrir}>
       {cuerpo}
     </button>
   ) : (
     <div className="fila-recinto">{cuerpo}</div>
+  );
+  if (!accion) return fila;
+  return (
+    <div className="fila-con-accion">
+      {fila}
+      <div className="fila-accion">{accion}</div>
+    </div>
   );
 }

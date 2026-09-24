@@ -33,16 +33,18 @@ Todo se hace desde **Historial → Usuarios**, con la cuenta de Administrador:
 - **Inspección:** además de revisar, recepciona, devuelve observaciones a pendiente y registra defectos nuevos.
 - **Administrador:** todo lo anterior, más Historial, cuentas, reapertura y anulación de fichas.
 
-## Respaldo (cada semana)
+## Respaldo (automático)
 
-El plan gratuito de Supabase **no guarda respaldos** y **pausa el proyecto tras 7 días sin uso**.
+El plan gratuito de Supabase **no guarda respaldos** y **pausa el proyecto tras 7 días sin uso**. Por eso hay una tarea de Windows en este computador, **«RSCLL respaldo»**, que corre **lunes y jueves a las 09:00**. Si el computador está apagado a esa hora, corre al encenderlo. Además, al usar el proyecto dos veces por semana evita que Supabase lo pause.
 
-```bash
-# desde prototipo/
-node scripts/respaldo.mjs
-```
-
-Descarga todas las tablas (`datos.json`) y todas las fotos a `prototipo/respaldos/AAAAMMDD_HHMM/`. Esa carpeta no se sube a GitHub: copie el respaldo a otro disco o a la nube.
+- **Qué guarda:** todas las tablas (`datos.json`) y todas las fotos, en `prototipo/respaldos/AAAAMMDD_HHMM/`.
+- **Cuántos conserva:** los **10** más recientes; los anteriores se borran solos.
+- **Registro:** cada ejecución deja una línea en `prototipo/respaldos/registro.log`, con OK o ERROR.
+- **Revisar la tarea:** en el Programador de tareas de Windows, «RSCLL respaldo». El último resultado 0 significa correcto.
+- **Respaldo manual en cualquier momento:** `node scripts/respaldo.mjs`, desde `prototipo/`.
+- **Programar la tarea en otro computador:** `powershell -ExecutionPolicy Bypass -File scripts\programar_respaldo.ps1`.
+- **Guardar en otra carpeta**, por ejemplo una de OneDrive para tener copia fuera del equipo: agregue `RSCLL_RESPALDOS=C:\ruta\a\la\carpeta` en `.env.supabase.local`. Para cambiar cuántos se conservan, use `RSCLL_RESPALDOS_CONSERVAR=10`.
+- **Requisito:** la tarea usa la clave secreta de `.env.supabase.local`. Si esa clave se cambia en Supabase, hay que actualizar el archivo.
 
 **Otra vía:** en la app, **Historial → Respaldo** descarga los datos sin las fotos.
 
@@ -99,7 +101,7 @@ Todos los comandos van desde `prototipo/app/`.
 | --- | --- | --- |
 | `npm test` | 23 pruebas: reglas de estado, permisos por rol, seguridad de la base, informes. | Base temporal en memoria. |
 | `npm run lint` | Calidad del código. | — |
-| `npm run build:demo` y `npm run preview`, y en otra terminal `npm run e2e` | Recorrido completo de 19 pasos en Edge: plantas, revisión con foto, subsanación, recepción, PDF, Excel e Historial. | Modo demostración. |
+| `npm run build:demo` y `npm run preview`, y en otra terminal `npm run e2e` | Recorrido completo de 21 pasos en Edge: plantas, revisión con foto, subsanación, recepción (también desde la lista), PDF, Excel e Historial. | Modo demostración. |
 | `npm run e2e:camara` | Cámara dentro de la app, con permiso concedido y denegado. | Modo demostración. |
 | `npm run e2e:informe -- <carpeta> <foto>` | Informes PDF de varias hojas. | Modo demostración. |
 | `npm run e2e:capturas -- <carpeta>` | Capturas de todas las pantallas, en teléfono y escritorio. | Modo demostración. |

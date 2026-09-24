@@ -80,8 +80,8 @@ Revisión previa al inicio de las revisiones reales. Cubre tres cosas:
 | --- | --- | --- | --- |
 | M1 | **Trabajo completo sin señal:** guardar en el teléfono la última copia de plantas, estados y fichas abiertas. | Hoy sin señal se conservan la sesión y la cola, pero no se ven plantas ni fichas. Es clave en recintos interiores sin cobertura. | Medio |
 | M2 | **Editar nombres de recintos desde la app** (Administrador). | Cierra §16.2 sin depender de SQL. | Bajo |
-| M3 | **Recepcionar desde la lista** «Listos para inspeccionar». | Inspección recepciona varios recintos seguidos sin entrar a cada ficha. | Bajo |
-| M4 | **Respaldo automático semanal** (tarea programada de Windows o GitHub). | Elimina el riesgo de olvidarlo mientras se esté en el plan gratuito. | Bajo |
+| M3 ✅ | **Recepcionar desde la lista** «Listos para inspeccionar». | Inspección recepciona varios recintos seguidos sin entrar a cada ficha. | Bajo |
+| M4 ✅ | **Respaldo automático semanal** (tarea programada de Windows o GitHub). | Elimina el riesgo de olvidarlo mientras se esté en el plan gratuito. | Bajo |
 | M5 | **PDF más liviano** en el teléfono: fuentes reducidas. | El primer informe pasa de ≈ 815 KB a ≈ 300 KB. | Bajo |
 | M6 | **Revisar desde la planta:** al tocar un recinto en Revisión → Planta, botón directo «Iniciar revisión». | Un paso menos. | Bajo |
 | M7 | **Recintos recientes** al entrar a Revisión. | Volver a un recinto de hoy en 1 toque. | Bajo |
@@ -89,9 +89,13 @@ Revisión previa al inicio de las revisiones reales. Cubre tres cosas:
 | M9 | **Borrar las fotos del almacenamiento** al eliminar una observación. | Evita ocupar espacio del plan con fotos huérfanas. | Bajo |
 | M10 | **Recuperar clave por correo.** | Menos dependencia del Administrador. Requiere configurar un servicio de correo. | Medio |
 
+**Hechas el 24-09-2026:**
+- M3: botón «Recepcionar» en la lista y en la planta, con confirmación en la misma línea.
+- M4: tarea de Windows lunes y jueves, con retención de 10 respaldos y registro.
+
 **Orden sugerido:**
-- **Antes de salir a terreno:** M1, M2 y M3.
-- **En la primera semana:** M4 y M5.
+- **Antes de salir a terreno:** M1 y M2.
+- **En la primera semana:** M5.
 - **Después:** el resto.
 
 ## 5. Acciones pendientes del responsable
@@ -99,4 +103,4 @@ Revisión previa al inicio de las revisiones reales. Cubre tres cosas:
 1. **Revocar el token personal de Supabase** que se compartió por chat (supabase.com/dashboard/account/tokens). Al 24-09 seguía activo.
 2. **Decidir el plan de alojamiento:** Vercel Pro o un servicio alternativo, por el uso comercial.
 3. **Confirmar los nombres de los recintos** (§16.2).
-4. **Respaldo semanal**, mientras se siga en Supabase Free.
+4. **Mantener encendido y con sesión iniciada, al menos a ratos, el computador que tiene la tarea de respaldo.** Revisar de vez en cuando `respaldos/registro.log`.

@@ -608,3 +608,18 @@ button.fila-recinto:hover { background: var(--realce); }
 .camara-pasos { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.35rem; font-size: 0.9375rem; }
 .camara-alternativas { display: grid; gap: 0.5rem; width: 100%; margin-top: 0.4rem; }
 .camara-sutil { border-color: var(--linea); }
+
+/* ───── recepción rápida (Inspección) ───── */
+.fila-con-accion { display: flex; align-items: stretch; background: var(--papel); border-bottom: 1px solid var(--linea-suave); }
+.fila-con-accion .fila-recinto { flex: 1; min-width: 0; border-bottom: none; }
+.fila-accion { display: flex; align-items: center; padding: 0.4rem 0.6rem 0.4rem 0; }
+.recepcion-confirmar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+.recepcion-confirmar.ancho { width: 100%; justify-content: flex-end; }
+@media (max-width: 480px) {
+  .fila-con-accion { flex-wrap: wrap; }
+  .fila-accion { width: 100%; justify-content: flex-end; padding: 0 0.75rem 0.55rem; }
+}
+@media (min-width: 1024px) { .lista-recintos .fila-con-accion:nth-child(odd) { border-right: 1px solid var(--linea-suave); } }
+/* Botones de color: el hover general (fondo claro) no debe dejarlos con texto blanco sobre blanco. */
+.boton-recepcion:hover { background: #22632a; border-color: #22632a; }
+.boton-peligro.lleno:hover { background: #8f1e18; border-color: #8f1e18; }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { FranjaEstados, ResumenEstados } from '../../components/Estado';
 import { useEsEscritorio } from '../../components/Layout';
 import { PlantaViewer } from '../../components/PlantaViewer';
@@ -50,11 +50,13 @@ export function ListaExteriores({
   estados,
   resaltado,
   onAbrir,
+  accion,
 }: {
   recintos: Recinto[];
   estados: Map<string, EstadoFila>;
   resaltado?: string | null;
   onAbrir?: (r: Recinto) => void;
+  accion?: (r: Recinto) => ReactNode;
 }) {
   const exteriores = recintos.filter((r) => r.sectores.some((s) => s.sector === 'Exterior (D)'));
   useEffect(() => {
@@ -68,6 +70,7 @@ export function ListaExteriores({
             recinto={r}
             estado={estados.get(r.id)}
             onAbrir={onAbrir ? () => onAbrir(r) : undefined}
+            accion={accion?.(r)}
             extra={r.figuras.length > 0 ? ' · también en la planta de Casa' : undefined}
           />
         </div>

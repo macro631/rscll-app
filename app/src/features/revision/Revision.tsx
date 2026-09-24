@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSesion } from '../../auth';
 import { Icono } from '../../components/Icono';
 import { PlantaViewer } from '../../components/PlantaViewer';
+import { RecepcionRapida } from '../../components/RecepcionRapida';
 import { coincide, FilaRecinto } from '../../components/Recintos';
 import { useCatalogo, useEstados, useMisRevisiones } from '../../lib/datos';
 import { fecha } from '../../lib/formato';
@@ -20,6 +21,10 @@ const FILTROS: Record<Vista, { texto: string; cumple: (e: EstadoFila | undefined
   todos: { texto: 'Todos', cumple: () => true },
 };
 
+// La vista inicial es la planta. La elección se recuerda mientras la app está abierta
+// (volver desde una ficha no la cambia) y vuelve a Planta al abrir la app de nuevo.
+let vistaRecordada: 'lista' | 'planta' = 'planta';
+
 export function Revision() {
   const { perfil } = useSesion();
   const navegar = useNavigate();
@@ -33,7 +38,13 @@ export function Revision() {
     : ['nueva', 'pendientes', 'listos', 'todos'];
   const [vista, setVista] = useState<Vista>(vistas[0]);
   const [texto, setTexto] = useState('');
-  const [modo, setModo] = useState<'lista' | 'planta'>('lista');
+  const [modo, setModoEstado] = useState<'lista' | 'planta'>(vistaRecordada);
+  const setModo = (m: 'lista' | 'planta') => {
+    vistaRecordada = m;
+    setModoEstado(m);
+  };
+  const recepcionRapida = (r: Recinto) =>
+    esInspeccion && mapa.get(r.id)?.estado === 'listo' ? <RecepcionRapida recinto={r} /> : undefined;
   const [sectorPlanta, setSectorPlanta] = useSectorRecordado();
   const [abiertos, setAbiertos] = useState<Set<string>>(new Set());
 
@@ -70,7 +81,11 @@ export function Revision() {
               placeholder="Buscar por código o nombre"
               aria-label="Buscar recinto por código o nombre"
               value={texto}
-              onChange={(e) => setTexto(e.target.value)}
+              onChange={(e) => {
+                setTexto(e.target.value);
+                // Buscar muestra los resultados en lista, aunque se esté viendo la planta.
+                if (e.target.value.trim() && modo === 'planta') setModo('lista');
+              }}
             />
           </div>
           <div className="segmentado" role="tablist" aria-label="Vista" style={{ flex: 'none' }}>
@@ -95,7 +110,7 @@ export function Revision() {
         )}
       </div>
 
-      {!!mis.data?.length && modo === 'lista' && (
+      {!!mis.data?.length && (
         <section className="continuar" aria-label="Mis revisiones abiertas">
           <h2>Continuar mi revisión</h2>
           {mis.data.map((m) => (
@@ -139,7 +154,7 @@ export function Revision() {
                   {abierto && (
                     <div className="lista-recintos">
                       {rs.map((r) => (
-                        <FilaRecinto key={r.id} recinto={r} estado={mapa.get(r.id)} onAbrir={() => abrir(r)} />
+                        <FilaRecinto key={r.id} recinto={r} estado={mapa.get(r.id)} onAbrir={() => abrir(r)} accion={recepcionRapida(r)} />
                       ))}
                     </div>
                   )}
@@ -156,10 +171,11 @@ export function Revision() {
           porId={porId}
           modo="seleccion"
           onAbrir={abrir}
+          accionExtra={(r) => (esInspeccion && mapa.get(r.id)?.estado === 'listo' ? <RecepcionRapida recinto={r} ancho /> : null)}
           claseMarco="modo-seleccion-marco"
         />
       ) : (
-        <ListaExteriores recintos={recintos} estados={mapa} onAbrir={abrir} />
+        <ListaExteriores recintos={recintos} estados={mapa} onAbrir={abrir} accion={recepcionRapida} />
       )}
     </div>
   );

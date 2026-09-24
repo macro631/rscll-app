@@ -19,6 +19,9 @@ Decisiones tomadas por Calidad durante el desarrollo. Donde una decisión contra
 | 24-09-2026 | Limpieza de datos de prueba. La operación real parte en la observación N° 1. | — |
 | 24-09-2026 | Orden de la carpeta: se elimina la versión local anterior (Node + SQLite) y el material de origen pasa a `RF/fuentes/`. | — |
 | 24-09-2026 | Sin señal, la app conserva la sesión y la cola de observaciones en vez de cerrar la sesión. | §13 |
+| 24-09-2026 | Revisión abre en la vista **Planta**. Al escribir en el buscador se pasa a la lista de resultados. | §7.1 |
+| 24-09-2026 | **Recepción rápida:** Inspección recepciona desde la lista «Listos para inspeccionar» o desde la tarjeta del recinto en la planta, con confirmación en la misma línea («¿Recepcionar A-02? Sí · No»), porque una recepción por error no se puede deshacer si el recinto no tiene observaciones. | §8 |
+| 24-09-2026 | **Respaldo automático** lunes y jueves (tarea de Windows «RSCLL respaldo»), conservando los 10 más recientes. | §13 |
 
 **Pendientes de la especificación:**
 - **§16.2:** confirmar los nombres finales de los recintos. Los códigos ya están validados contra los planos.

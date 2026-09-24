@@ -124,7 +124,18 @@ try {
   await salir(tel);
   await entrarComo(tel, 'Inspección Técnica');
   await tel.getByRole('link', { name: /Revisión/ }).click();
-  await tel.getByRole('tab', { name: /Listos para inspeccionar/ }).waitFor();
+  esperar((await tel.getByRole('tab', { name: 'Planta', exact: true }).getAttribute('aria-selected')) === 'true', 'Revisión abre en la vista Planta');
+
+  // M3: recepcionar desde la lista «Listos para inspeccionar», sin entrar a la ficha
+  await tel.getByRole('tab', { name: 'Lista', exact: true }).click();
+  await tel.getByRole('tab', { name: /Listos para inspeccionar/ }).click();
+  await tel.locator('.grupo-sector-cabeza', { hasText: 'Piso 1' }).click();
+  await tel.getByRole('button', { name: 'Recepcionar A-01' }).click();
+  await tel.getByRole('group', { name: 'Confirmar recepción de A-01' }).getByRole('button', { name: 'Sí' }).click();
+  await tel.locator('.aviso', { hasText: 'A-01 recepcionado' }).waitFor();
+  await tel.locator('.fila-recinto', { hasText: 'A-01' }).waitFor({ state: 'detached' });
+  ok('Inspección recepciona A-01 desde la lista, con confirmación en la misma fila');
+
   await buscar(tel).fill('A-20');
   await tel.locator('.lista-recintos .fila-recinto').first().click();
   await tel.getByRole('button', { name: /Recepcionar/ }).click();
