@@ -27,8 +27,9 @@ export function Revision() {
   const { mapa } = useEstados();
   const mis = useMisRevisiones();
   const esInspeccion = perfil?.rol === 'inspeccion';
+  // Inspección también revisa: parte en lo suyo (listos para inspeccionar) y tiene además los filtros de revisión.
   const vistas: Vista[] = esInspeccion
-    ? ['listos', 'devueltos', 'recepcionados', 'todos']
+    ? ['listos', 'devueltos', 'nueva', 'pendientes', 'recepcionados', 'todos']
     : ['nueva', 'pendientes', 'listos', 'todos'];
   const [vista, setVista] = useState<Vista>(vistas[0]);
   const [texto, setTexto] = useState('');

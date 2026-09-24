@@ -195,6 +195,28 @@ describe('Inspección y recepción', () => {
     ).rejects.toThrow(/rol/);
   });
 
+  it('Inspección también revisa: abre su ficha, registra observaciones y finaliza (decisión 24-09-2026)', async () => {
+    const { rev, ids } = await revisar(INSP, 'RSCLL:A-17', [['Climatización', 'Rejilla sin fijar']], false);
+    expect(await estado('RSCLL:A-17')).toBe('en_revision');
+    c.como(INSP);
+    await c.rpc('editar_observacion', { p_observacion: ids[0], p_especialidad: 'Climatización', p_descripcion: 'Rejilla de retorno sin fijar' });
+    await c.rpc('finalizar_revision', { p_revision: rev });
+    expect(await estado('RSCLL:A-17')).toBe('pendiente');
+    // Sus funciones propias se mantienen: subsana y recepciona.
+    c.como(INSP);
+    await c.rpc('marcar_subsanada', { p_observacion: ids[0] });
+    await c.rpc('recepcionar', { p_recinto: 'RSCLL:A-17' });
+    expect(await estado('RSCLL:A-17')).toBe('recepcionado');
+    // Y sigue sin poder escribir en la ficha de otra persona.
+    const otra = await revisar(REV1, 'RSCLL:A-18', [], false);
+    c.como(INSP);
+    await expect(
+      c.rpc('agregar_observacion', { p_revision: otra.rev, p_especialidad: 'Pintura', p_descripcion: 'x' }),
+    ).rejects.toThrow(/autor/);
+    c.como(REV1);
+    await c.rpc('finalizar_revision', { p_revision: otra.rev });
+  });
+
   it('revisión de un área exterior sin polígono (criterio 6)', async () => {
     await revisar(REV1, 'RSCLL:D-01', [['Paisajismo', 'Faltan especies']]);
     expect(await estado('RSCLL:D-01')).toBe('pendiente');

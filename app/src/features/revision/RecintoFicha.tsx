@@ -53,7 +53,7 @@ export function RecintoFicha() {
 
   const acciones = (
     <div className="acciones-principales">
-      {puede('admin', 'revisor') &&
+      {puede('admin', 'revisor', 'inspeccion') &&
         (misAbiertas.length > 0 ? (
           <button className="boton boton-primario boton-alto" onClick={() => navegar(`/revision/ficha/${misAbiertas[0]}`)}>
             Continuar mi revisión

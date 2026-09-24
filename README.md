@@ -24,7 +24,7 @@ prototipo/
     src/test/sql.test.ts    Criterios de aceptación sobre la base real (PGlite)
     e2e/recorrido.mjs       Recorrido completo en Edge/Chrome
   supabase/
-    migrations/             001 esquema · 002 estado · 003 RLS · 004 acciones · 005 consultas · 006 storage/realtime
+    migrations/             001 esquema · 002 estado · 003 RLS · 004 acciones · 005 consultas · 006 storage/realtime · 007 Inspección revisa
     seed.sql                Catálogo de 100 unidades (generado)
     instalar.sql            Todo lo anterior en un solo archivo (generado)
     functions/admin-usuarios/  Alta de cuentas y cambio de clave (Edge Function)
@@ -111,6 +111,7 @@ VITE_MODO=demo npm run build
   4. Recepción vigente: verde oscuro.
   5. Resto: verde claro.
 - **Escaleras:** E1 y E2 son una sola unidad con figura en ambos pisos. El total global las cuenta una vez.
+- **Inspección también revisa** (decisión del 24-09-2026, reemplaza la restricción de §3): además de recepcionar, devolver y registrar defectos nuevos, abre sus propias fichas de revisión y registra observaciones como un Revisor. Migración `007_inspeccion_revisa.sql`.
 - **Recepción:** solo Inspección recepciona. Cualquier pendiente posterior deja la recepción sin vigencia, y el Historial la conserva.
 - **Defecto sin observación previa** (§16.1, resuelto): Inspección registra una *Observación de Inspección* con especialidad en un recinto verde claro o recepcionado.
 - **Administrador:** reabre, anula y revierte anulaciones, y todo queda en el Historial.

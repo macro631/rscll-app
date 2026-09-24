@@ -139,6 +139,18 @@ try {
   await tel.screenshot({ path: join(capturas, '06_ficha_inspeccion.png'), fullPage: true });
   esperar((await tel.getByRole('link', { name: /Historial/ }).count()) === 0, 'Inspección no ve Historial');
 
+  // Inspección también revisa
+  await tel.goto(`${URL}/revision/recinto/A-21`);
+  await tel.getByRole('button', { name: 'Iniciar revisión' }).click();
+  await tel.getByLabel('Especialidad').selectOption('Climatización');
+  await tel.getByPlaceholder(/Qué se observa/).fill('Rejilla de retorno sin fijar');
+  await tel.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await tel.locator('article.obs:not(.obs-en-cola)').filter({ hasText: 'Rejilla de retorno' }).waitFor();
+  await tel.getByRole('button', { name: 'Finalizar revisión' }).click();
+  await tel.waitForURL(/\/inicio/);
+  await tel.getByRole('tab', { name: 'Piso 1' }).click();
+  esperar((await estadoFigura(tel, 'RSCLL:A-21', 'estado-pendiente')).includes('estado-pendiente'), 'Inspección también revisa: registra una observación y A-21 queda ámbar');
+
   // Informes PDF desde el teléfono
   await tel.getByRole('link', { name: /Informes/ }).click();
   await tel.locator('summary', { hasText: 'Filtros' }).click();
