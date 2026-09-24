@@ -22,7 +22,7 @@ Decisiones tomadas por Calidad durante el desarrollo. Donde una decisión contra
 | 24-09-2026 | Revisión abre en la vista **Planta**. Al escribir en el buscador se pasa a la lista de resultados. | §7.1 |
 | 24-09-2026 | **Recepción rápida:** Inspección recepciona desde la lista «Listos para inspeccionar» o desde la tarjeta del recinto en la planta, con confirmación en la misma línea («¿Recepcionar A-02? Sí · No»), porque una recepción por error no se puede deshacer si el recinto no tiene observaciones. | §8 |
 | 24-09-2026 | **Respaldo automático** lunes y jueves (tarea de Windows «RSCLL respaldo»), conservando los 10 más recientes. | §13 |
-| 24-09-2026 | **Inicio:** la planta abre completa (encuadrada), con el marco ajustado a su forma, y los indicadores parten en «Total de la obra», también en el teléfono. En escritorio, un gráfico de anillo entre el selector y la tabla de estados. La tabla conserva cantidad, porcentaje y barra, y al pasar el cursor por un segmento o una fila se resaltan ambos. | §6.1, §6.2 |
+| 24-09-2026 | **Inicio:** la planta abre completa (encuadrada) dentro del visor de tamaño normal, con los controles en fila arriba para no taparla, y los indicadores parten en «Total de la obra», también en el teléfono. En escritorio, un gráfico de anillo entre el selector y la tabla de estados. La tabla conserva cantidad, porcentaje y barra, y al pasar el cursor por un segmento o una fila se resaltan ambos. | §6.1, §6.2 |
 
 **Pendientes de la especificación:**
 - **§16.2:** confirmar los nombres finales de los recintos. Los códigos ya están validados contra los planos.

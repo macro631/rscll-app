@@ -625,17 +625,13 @@ button.fila-recinto:hover { background: var(--realce); }
 .boton-peligro.lleno:hover { background: #8f1e18; border-color: #8f1e18; }
 
 /* ───── Inicio: planta encuadrada e indicadores ───── */
-/* El marco toma la proporción de la planta (--proporcion en línea, ancho del contenedor en cqw): la planta completa,
-   sin franjas vacías. Márgenes de 12 px a los lados y 58 px arriba y abajo (MARGEN_ENCUADRE en PlantaViewer). */
-.planta-encuadrada { container-type: inline-size; }
+/* Inicio: la planta abre completa dentro del visor, con los controles en fila arriba para no taparla.
+   En el teléfono el visor descuenta además el selector de alcance de los indicadores. */
 .planta-encuadrada .planta-marco {
-  min-height: 0;
-  height: clamp(200px, calc((100cqw - 24px) * var(--proporcion, 0.6) + 116px),
-    calc(100dvh - var(--barra-sup) - var(--barra-inf) - 264px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)));
+  min-height: 220px;
+  height: calc(100dvh - var(--barra-sup) - var(--barra-inf) - 277px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
-@media (min-width: 1024px) {
-  .planta-encuadrada .planta-marco { height: clamp(320px, calc((100cqw - 24px) * var(--proporcion, 0.6) + 116px), calc(100dvh - 150px)); }
-}
+@media (min-width: 1024px) { .planta-encuadrada .planta-marco { height: calc(100dvh - 150px); } }
 .planta-encuadrada .planta-controles { flex-direction: row; }
 .planta-encuadrada .planta-controles button + button { border-top: none; border-left: 1px solid var(--linea); }
 .indicadores-telefono { display: grid; gap: 0.4rem; }

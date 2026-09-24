@@ -1,14 +1,4 @@
-import {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
-  type ReactNode,
-} from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { MiniMap, TransformComponent, TransformWrapper, type ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { EstadoBadge } from './Estado';
@@ -28,7 +18,7 @@ const DEFS = `
   </pattern>
 </defs>`;
 
-/** Margen de la planta encuadrada: deja libres los controles (arriba) y la ayuda (abajo). Igual que en index.css. */
+/** Margen de la planta encuadrada: deja libres los controles (arriba) y la ayuda (abajo). */
 const MARGEN_ENCUADRE = { lado: 12, alto: 58 };
 
 /** Una planta es «larga» si es más del doble de alta que ancha: se muestra girada, en horizontal. */
@@ -97,7 +87,7 @@ interface Props {
   /** Acción adicional en la tarjeta del recinto tocado (p. ej. Recepcionar para Inspección). */
   accionExtra?: (r: Recinto, estado: EstadoFila | undefined) => ReactNode;
   claseMarco?: string;
-  /** Abrir con la planta completa y el marco ajustado a su forma (Inicio). */
+  /** Abrir con la planta completa, centrada en el visor (Inicio). */
   encuadrar?: boolean;
 }
 
@@ -224,11 +214,7 @@ export function PlantaViewer({ sector, estados, porId, resaltado, modo, onAbrir,
 
   return (
     <div className={`planta${encuadrar ? ' planta-encuadrada' : ''}`}>
-      <div
-        className={`planta-marco ${claseMarco ?? ''}`}
-        style={encuadrar && data ? ({ '--proporcion': data.proporcion } as CSSProperties) : undefined}
-        ref={marco}
-      >
+      <div className={`planta-marco ${claseMarco ?? ''}`} ref={marco}>
         {isLoading && <p className="planta-mensaje">Cargando planta…</p>}
         {error && <p className="planta-mensaje error-texto">No se pudo cargar la planta. La lista de recintos sigue disponible.</p>}
         {data && tam && ajuste && inicio && (
