@@ -6,10 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 4180 --strictPort",
     "test": "vitest run",
+    "lint": "oxlint",
+    "dev:demo": "vite --mode demo",
+    "build:demo": "tsc -b && vite build --mode demo",
     "e2e": "node e2e/recorrido.mjs",
-    "lint": "oxlint"
+    "e2e:camara": "node e2e/camara.mjs",
+    "e2e:informe": "node e2e/informe-largo.mjs",
+    "e2e:capturas": "node e2e/capturas.mjs",
+    "e2e:tiempo-real": "node e2e/tiempo-real.mjs",
+    "e2e:supabase": "node e2e/recorrido-supabase.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",

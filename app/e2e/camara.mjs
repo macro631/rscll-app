@@ -1,5 +1,5 @@
 // Cámara dentro de la app con una cámara simulada de Chromium: permiso concedido y permiso denegado.
-// Uso: VITE_MODO=demo npm run build && npx vite preview --port 4180 ; node e2e/camara.mjs [capturas]
+// Uso: npm run build:demo && npm run preview ; node e2e/camara.mjs [capturas]
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';

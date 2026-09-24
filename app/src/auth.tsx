@@ -2,7 +2,40 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from './lib/backend';
 import { detenerCola, iniciarCola } from './lib/cola';
+import { refrescar } from './lib/datos';
 import type { Perfil, Rol } from './lib/tipos';
+
+// Último perfil confirmado por el servidor: permite abrir la app sin señal sin perder la sesión.
+const CLAVE_PERFIL = 'rscll-perfil';
+
+function recordarPerfil(p: Perfil) {
+  try {
+    localStorage.setItem(CLAVE_PERFIL, JSON.stringify(p));
+  } catch {
+    /* sin almacenamiento local */
+  }
+}
+
+function perfilRecordado(uid: string): Perfil | null {
+  try {
+    const p = JSON.parse(localStorage.getItem(CLAVE_PERFIL) ?? 'null') as Perfil | null;
+    return p && p.id === uid && p.activo ? p : null;
+  } catch {
+    return null;
+  }
+}
+
+function olvidarPerfil() {
+  try {
+    localStorage.removeItem(CLAVE_PERFIL);
+  } catch {
+    /* sin almacenamiento local */
+  }
+}
+
+function esErrorDeRed(mensaje: string) {
+  return !navigator.onLine || /fetch|network|timeout|conexi/i.test(mensaje);
+}
 
 interface Sesion {
   perfil: Perfil | null;
@@ -41,14 +74,24 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
     }
     try {
       const p = await b.rpc<Perfil>('mi_perfil');
+      recordarPerfil(p);
       setPerfil(p);
       setError(null);
       qc.clear();
-      await iniciarCola(p.id, () => void qc.invalidateQueries());
+      await iniciarCola(p.id, () => refrescar(qc));
     } catch (e) {
-      setPerfil(null);
-      setError(e instanceof Error ? e.message : String(e));
-      await b.cerrarSesion();
+      const mensaje = e instanceof Error ? e.message : String(e);
+      const guardado = perfilRecordado(uid);
+      // Sin señal no se cierra la sesión: se sigue con el último perfil confirmado y la cola local.
+      if (esErrorDeRed(mensaje) && guardado) {
+        setPerfil(guardado);
+        setError(null);
+        await iniciarCola(guardado.id, () => refrescar(qc));
+      } else {
+        setPerfil(null);
+        setError(mensaje);
+        await b.cerrarSesion();
+      }
     } finally {
       setCargando(false);
     }
@@ -59,7 +102,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
     const b = api();
     const fin1 = b.alCambiarSesion(() => void cargar());
     // Cambios de otros usuarios (Supabase Realtime) o locales (demo) refrescan las vistas.
-    const fin2 = b.alCambiarDatos(() => void qc.invalidateQueries());
+    const fin2 = b.alCambiarDatos(() => refrescar(qc));
     return () => {
       fin1();
       fin2();
@@ -68,6 +111,7 @@ export function ProveedorSesion({ children }: { children: ReactNode }) {
 
   const salir = useCallback(async () => {
     detenerCola();
+    olvidarPerfil();
     await api().cerrarSesion();
     qc.clear();
   }, [qc]);

@@ -1,5 +1,5 @@
 // Genera informes de varias hojas (modo demostración) para revisar columnas, fotos y encabezados repetidos.
-// Uso: VITE_MODO=demo npm run build && npx vite preview --port 4180 ; node e2e/informe-largo.mjs <carpeta> <foto.png|jpg>
+// Uso: npm run build:demo && npm run preview ; node e2e/informe-largo.mjs <carpeta> <foto.png|jpg>
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';

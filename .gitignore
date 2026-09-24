@@ -1,13 +1,22 @@
+# Dependencias y compilación
 node_modules/
 dist/
 dev-dist/
+
+# Credenciales locales (nunca a GitHub). app/.env.production solo lleva valores públicos.
 .env
 .env.*
 !.env.example
-app/e2e/capturas/
+!app/.env.production
+
+# Resultados locales: respaldos y capturas de las pruebas de navegador
+respaldos/
+app/e2e/capturas*/
+app/e2e/informes/
+
+# Temporales de herramientas
 supabase/.temp/
 supabase/.branches/
 *.log
 .DS_Store
-!app/.env.production
-respaldos/
+.vscode/

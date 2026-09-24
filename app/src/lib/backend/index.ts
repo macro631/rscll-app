@@ -5,8 +5,9 @@ export type { Backend, Bucket, NuevoUsuario, UsuarioDemo } from './tipos';
 const URL_SUPABASE = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const CLAVE_SUPABASE = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-/** Sin variables de Supabase la app arranca en modo demostración. */
-export const MODO_DEMO = !URL_SUPABASE || !CLAVE_SUPABASE || import.meta.env.VITE_MODO === 'demo';
+/** Sin variables de Supabase (o con `vite --mode demo`) la app arranca en modo demostración. */
+export const MODO_DEMO =
+  !URL_SUPABASE || !CLAVE_SUPABASE || import.meta.env.VITE_MODO === 'demo' || import.meta.env.MODE === 'demo';
 
 let backend: Backend | null = null;
 let cargando: Promise<Backend> | null = null;

@@ -9,7 +9,7 @@ import { ObservacionEnCola, ObservacionForm, ObservacionItem } from '../../compo
 import { sectoresTexto } from '../../components/Recintos';
 import { api } from '../../lib/backend';
 import { descartar, encolar, useCola } from '../../lib/cola';
-import { useAccion, useCatalogo, useEstados, useFichaRecinto } from '../../lib/datos';
+import { refrescar, useAccion, useCatalogo, useEstados, useFichaRecinto } from '../../lib/datos';
 import { fecha } from '../../lib/formato';
 import { ACCIONES, type Revision } from '../../lib/tipos';
 
@@ -42,7 +42,7 @@ export function RecintoFicha() {
     setAbriendo(true);
     try {
       const id = await api().rpc<string>('abrir_revision', { p_recinto: recinto!.id });
-      void qc.invalidateQueries();
+      refrescar(qc);
       navegar(`/revision/ficha/${id}`);
     } catch (e) {
       aviso(e instanceof Error ? e.message : String(e), 'error');

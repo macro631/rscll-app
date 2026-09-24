@@ -1,5 +1,5 @@
 // Capturas de todas las pantallas (modo demostración) en teléfono y escritorio, para revisar el diseño.
-// Uso: VITE_MODO=demo npm run build && npx vite preview --port 4180
+// Uso: npm run build:demo && npm run preview
 //      URL_APP=http://localhost:4180 node e2e/capturas.mjs <carpeta>
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';

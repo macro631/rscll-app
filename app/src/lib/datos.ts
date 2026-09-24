@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { api } from './backend';
 import { useAviso } from '../components/Aviso';
@@ -94,6 +94,14 @@ export function useNombresUsuarios() {
   });
 }
 
+/** Consultas que no cambian con el trabajo diario: no se vuelven a pedir cuando otro usuario registra algo. */
+const ESTATICAS = new Set(['catalogo', 'svg', 'usuarios-nombres']);
+
+/** Refresca solo los datos que cambian (estados, fichas, búsquedas, historial). */
+export function refrescar(qc: QueryClient) {
+  void qc.invalidateQueries({ predicate: (q) => !ESTATICAS.has(String(q.queryKey[0])) });
+}
+
 /** Quita filtros vacíos: ausente equivale a «Todos». */
 export function limpiar(filtros: FiltrosObservacion) {
   return Object.fromEntries(Object.entries(filtros).filter(([, v]) => v !== undefined && v !== '')) as FiltrosObservacion;
@@ -106,7 +114,9 @@ export function useAccion() {
   return useMutation({
     mutationFn: ({ fn, args }: { fn: string; args?: Record<string, unknown>; ok?: string }) => api().rpc<unknown>(fn, args),
     onSuccess: (_r, vars) => {
-      void qc.invalidateQueries();
+      // Las acciones de administración pueden cambiar nombres o roles: esas refrescan todo.
+      if (vars.fn.startsWith('admin_')) void qc.invalidateQueries();
+      else refrescar(qc);
       if (vars.ok) aviso(vars.ok);
     },
     onError: (e) => aviso(e instanceof Error ? e.message : String(e), 'error'),

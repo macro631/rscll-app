@@ -1,5 +1,5 @@
 // Recorrido de humo en el navegador (modo demostración) con Edge o Chrome instalado.
-// Uso: VITE_MODO=demo npm run build && npx vite preview --port 4180   (en otra terminal)
+// Uso: npm run build:demo && npm run preview   (en otra terminal)
 //      node e2e/recorrido.mjs [carpeta_capturas]
 import { chromium } from 'playwright-core';
 import { mkdirSync, statSync } from 'node:fs';
