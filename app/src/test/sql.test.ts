@@ -302,6 +302,43 @@ describe('administración', () => {
     expect(await estado('RSCLL:A-15')).toBe('en_revision');
   });
 
+  it('el Administrador traslada observaciones de una ficha finalizada a otro recinto conservando datos y fotos', async () => {
+    const { rev, ids } = await revisar(REV1, 'RSCLL:A-30', [
+      ['Pintura', 'Muro manchado'],
+      ['Puertas', 'Bisagra suelta'],
+      ['Sanitario', 'Llave gotea'],
+    ]);
+    c.como(REV1);
+    await c.rpc('agregar_foto', { p_observacion: ids[0], p_path_original: `${ids[0]}/f.jpg`, p_path_ligera: `${ids[0]}/f.jpg` });
+    await revisar(REV2, 'RSCLL:A-31');
+    c.como(INSP);
+    await c.rpc('recepcionar', { p_recinto: 'RSCLL:A-31' });
+    const abierta = await revisar(REV2, 'RSCLL:A-32', [['Pintura', 'En curso']], false);
+
+    const args = { p_observaciones: [ids[0], ids[1]], p_recinto: 'RSCLL:A-31', p_motivo: 'Registradas en el recinto equivocado' };
+    c.como(REV1);
+    await expect(c.rpc('mover_observaciones', args)).rejects.toThrow(/rol/);
+    c.como(ADMIN);
+    await expect(
+      c.rpc('mover_observaciones', { ...args, p_observaciones: abierta.ids, p_recinto: 'RSCLL:A-30' }),
+    ).rejects.toThrow(/finalizadas/);
+    const nueva = await c.rpc<string>('mover_observaciones', args);
+
+    type Ficha = { revision: { autor_id: string; recinto_id: string }; observaciones: { id: string; especialidad: string; descripcion: string; estado: string; fotos: unknown[] }[] };
+    const destino = await c.rpc<Ficha>('ficha_revision', { p_revision: nueva });
+    expect(destino.revision).toMatchObject({ autor_id: REV1, recinto_id: 'RSCLL:A-31' });
+    expect(destino.observaciones.map((o) => [o.id, o.especialidad, o.descripcion, o.estado, o.fotos.length])).toEqual([
+      [ids[0], 'Pintura', 'Muro manchado', 'pendiente', 1],
+      [ids[1], 'Puertas', 'Bisagra suelta', 'pendiente', 0],
+    ]);
+    const origen = await c.rpc<Ficha>('ficha_revision', { p_revision: rev });
+    expect(origen.observaciones.map((o) => o.id)).toEqual([ids[2]]);
+    expect(await estado('RSCLL:A-31')).toBe('pendiente'); // la recepción deja de estar vigente
+    expect(await estado('RSCLL:A-32')).toBe('en_revision'); // la ficha abierta no se tocó
+    const h = await c.rpc<{ filas: { accion: string }[] }>('historial', { p_filtros: { recinto: 'RSCLL:A-30' } });
+    expect(h.filas.map((f) => f.accion)).toContain('traslado_observaciones');
+  });
+
   it('una cuenta desactivada no puede operar', async () => {
     const X = '00000000-0000-0000-0000-0000000000cc';
     await crearUsuario(db, X, 'Temporal', 'revisor');

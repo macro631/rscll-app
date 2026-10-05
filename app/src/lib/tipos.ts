@@ -206,6 +206,7 @@ export const ACCIONES: Record<string, string> = {
   reapertura: 'Reapertura de ficha',
   anulacion: 'Anulación de ficha',
   reversion_anulacion: 'Reversión de anulación',
+  traslado_observaciones: 'Traslado de observaciones',
   perfil: 'Cambio de usuario',
   alta_usuario: 'Alta de usuario',
 };

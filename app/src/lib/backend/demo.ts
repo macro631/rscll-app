@@ -10,13 +10,14 @@ import m004 from '../../../../supabase/migrations/004_rpc.sql?raw';
 import m005 from '../../../../supabase/migrations/005_consultas.sql?raw';
 import m007 from '../../../../supabase/migrations/007_inspeccion_revisa.sql?raw';
 import m008 from '../../../../supabase/migrations/008_endurecimiento.sql?raw';
+import m009 from '../../../../supabase/migrations/009_mover_observaciones.sql?raw';
 import seed from '../../../../supabase/seed.sql?raw';
 import type { Backend, Bucket, NuevoUsuario, UsuarioDemo } from './tipos';
 
 const BASE = 'rscll-demo';
 const CLAVE_SESION = 'rscll-demo-usuario';
 const CLAVE_VERSION = 'rscll-demo-version';
-const SCRIPTS = [authStub, m001, m002, m003, m004, m005, m007, m008, seed];
+const SCRIPTS = [authStub, m001, m002, m003, m004, m005, m007, m008, m009, seed];
 
 export const USUARIOS_DEMO: UsuarioDemo[] = [
   { id: '00000000-0000-4000-8000-00000000000a', nombre: 'Calidad', rol: 'admin' },

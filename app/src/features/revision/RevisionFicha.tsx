@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useSesion } from '../../auth';
 import { useAviso } from '../../components/Aviso';
@@ -14,7 +14,7 @@ export function RevisionFicha() {
   const navegar = useNavigate();
   const aviso = useAviso();
   const { perfil } = useSesion();
-  const { porId } = useCatalogo();
+  const { porId, recintos } = useCatalogo();
   const ficha = useFichaRevision(id);
   // Todo el recinto (todas las fichas): se refresca en tiempo real cuando otra persona registra algo.
   const delRecinto = useFichaRecinto(ficha.data?.revision.recinto_id);
@@ -23,6 +23,11 @@ export function RevisionFicha() {
   const [formulario, setFormulario] = useState(false);
   const [nuevas, setNuevas] = useState<Set<string>>(new Set());
   const vistas = useRef<Set<string> | null>(null);
+  // Traslado por el Administrador de observaciones registradas en el recinto equivocado.
+  const [trasladando, setTrasladando] = useState(false);
+  const [elegidas, setElegidas] = useState<Set<string>>(new Set());
+  const [destino, setDestino] = useState('');
+  const [motivo, setMotivo] = useState('');
   const editable = !!ficha.data && ficha.data.revision.autor_id === perfil?.id && ficha.data.revision.condicion === 'abierta';
 
   const otras = useMemo(
@@ -86,6 +91,40 @@ export function RevisionFicha() {
     );
   }
 
+  const puedeTrasladar = perfil?.rol === 'admin' && revision.condicion === 'finalizada' && observaciones.length > 0;
+
+  function alternar(obsId: string) {
+    setElegidas((e) => {
+      const n = new Set(e);
+      if (n.has(obsId)) n.delete(obsId);
+      else n.add(obsId);
+      return n;
+    });
+  }
+
+  function cancelarTraslado() {
+    setTrasladando(false);
+    setElegidas(new Set());
+  }
+
+  function trasladar(e: FormEvent) {
+    e.preventDefault();
+    const n = elegidas.size;
+    accion.mutate(
+      {
+        fn: 'mover_observaciones',
+        args: { p_observaciones: [...elegidas], p_recinto: destino, p_motivo: motivo },
+        ok: `${n} observación${n === 1 ? '' : 'es'} trasladada${n === 1 ? '' : 's'} a ${porId.get(destino)?.codigo ?? ''}`,
+      },
+      {
+        onSuccess: (nueva) => {
+          cancelarTraslado();
+          navegar(`/revision/ficha/${nueva as string}`);
+        },
+      },
+    );
+  }
+
   return (
     <div className="ficha">
       <Link to={recinto ? `/revision/recinto/${encodeURIComponent(recinto.codigo)}` : '/revision'} className="volver">
@@ -121,6 +160,40 @@ export function RevisionFicha() {
         <h2>{editable ? 'Mis observaciones' : 'Observaciones de esta ficha'}</h2>
         <span className="suave chico">{total}</span>
       </div>
+      {puedeTrasladar && !trasladando && (
+        <div className="acciones">
+          <button className="boton boton-sutil boton-chico" onClick={() => setTrasladando(true)}>
+            Trasladar observaciones a otro recinto
+          </button>
+        </div>
+      )}
+      {puedeTrasladar && trasladando && (
+        <form className="formulario" onSubmit={trasladar}>
+          <p className="nota chico">
+            Marque las observaciones registradas en el recinto equivocado. Pasan a una ficha nueva del recinto destino con el mismo
+            autor y fechas, y conservan número, especialidad, descripción, estado, fotos y comentarios.
+          </p>
+          <select required aria-label="Recinto destino" value={destino} onChange={(e) => setDestino(e.target.value)}>
+            <option value="">Recinto destino…</option>
+            {recintos
+              .filter((r) => r.id !== revision.recinto_id)
+              .map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.codigo} · {r.nombre}
+                </option>
+              ))}
+          </select>
+          <input required placeholder="Motivo del traslado" aria-label="Motivo del traslado" value={motivo} onChange={(e) => setMotivo(e.target.value)} />
+          <div className="acciones">
+            <button className="boton boton-primario boton-chico" disabled={accion.isPending || elegidas.size === 0}>
+              Trasladar {elegidas.size} seleccionada{elegidas.size === 1 ? '' : 's'}
+            </button>
+            <button type="button" className="boton boton-sutil boton-chico" onClick={cancelarTraslado}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
       {total === 0 && (
         <p className="vacio">
           {editable
@@ -132,9 +205,24 @@ export function RevisionFicha() {
         {cola.map((i) => (
           <ObservacionEnCola key={i.id} item={i} alDescartar={() => descartar(i.id)} />
         ))}
-        {[...observaciones].reverse().map((o) => (
-          <ObservacionItem key={o.id} obs={o} acciones={{ editar: editable, comprobar: true, devolver: true }} />
-        ))}
+        {[...observaciones].reverse().map((o) =>
+          trasladando ? (
+            <div key={o.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+              <input
+                type="checkbox"
+                aria-label={`Seleccionar N° ${o.numero}`}
+                checked={elegidas.has(o.id)}
+                onChange={() => alternar(o.id)}
+                style={{ marginTop: '1rem', width: '1.25rem', height: '1.25rem', flexShrink: 0 }}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <ObservacionItem obs={o} />
+              </div>
+            </div>
+          ) : (
+            <ObservacionItem key={o.id} obs={o} acciones={{ editar: editable, comprobar: true, devolver: true }} />
+          ),
+        )}
       </div>
 
       {otras.length > 0 && (

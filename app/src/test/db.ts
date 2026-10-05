@@ -13,6 +13,7 @@ export const SCRIPTS = [
   'migrations/005_consultas.sql',
   'migrations/007_inspeccion_revisa.sql',
   'migrations/008_endurecimiento.sql',
+  'migrations/009_mover_observaciones.sql',
   'seed.sql',
 ];
 
